@@ -3,6 +3,7 @@ from fastapi import FastAPI
 
 from app.api.routes.health import router as health_router
 from app.api.routes.climate import router as climate_router
+from app.api.routes.analysis import router as analysis_router
 from app.core.config import settings
 
 
@@ -16,9 +17,9 @@ app = FastAPI(
     debug=settings.DEBUG,
 )
 
-# API routers
 app.include_router(health_router)
 app.include_router(climate_router)
+app.include_router(analysis_router)
 
 
 @app.get("/", tags=["Root"])
