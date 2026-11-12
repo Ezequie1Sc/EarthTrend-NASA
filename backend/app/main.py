@@ -2,20 +2,31 @@
 from fastapi import FastAPI
 
 from app.api.routes.health import router as health_router
+from app.api.routes.climate import router as climate_router
+from app.core.config import settings
+
 
 app = FastAPI(
-    title="EarthTrend NASA API",
-    description="NASA Earth science trend analysis platform.",
-    version="0.1.0",
+    title=settings.APP_NAME,
+    description=(
+        "EarthTrend NASA API — Earth science data "
+        "exploration and climate trend analysis."
+    ),
+    version=settings.APP_VERSION,
+    debug=settings.DEBUG,
 )
 
+# API routers
 app.include_router(health_router)
+app.include_router(climate_router)
 
 
 @app.get("/", tags=["Root"])
 def root():
     return {
+        "application": settings.APP_NAME,
         "message": "EarthTrend NASA API is running",
         "status": "ok",
+        "version": settings.APP_VERSION,
         "documentation": "/docs",
     }
