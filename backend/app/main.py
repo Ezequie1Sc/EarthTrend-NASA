@@ -1,5 +1,7 @@
 
 from fastapi import FastAPI
+from fastapi.middleware.gzip import GZipMiddleware
+from app.api.routes.thermal import router as thermal_router
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.health import router as health_router
@@ -31,7 +33,10 @@ app.add_middleware(
     allow_headers=["Content-Type", "Accept"],
 )
 
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 # API routers
+app.include_router(thermal_router)
 app.include_router(health_router)
 app.include_router(climate_router)
 app.include_router(analysis_router)

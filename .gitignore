@@ -24,3 +24,6 @@ __pycache__/
 # System
 .DS_Store
 Thumbs.db
+
+# Generated climate data cache
+/backend/data/cache/

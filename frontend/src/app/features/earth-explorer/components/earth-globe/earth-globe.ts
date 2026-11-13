@@ -5,13 +5,28 @@ import {
   ElementRef,
   OnDestroy,
   ViewChild,
+  inject,
   input,
   output,
   signal,
 } from '@angular/core';
 
+import { Subscription } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ThermalControls } from '../thermal-controls/thermal-controls';
+import { ThermalGrid, ThermalProvider, ThermalSource } from '../../../../core/models/thermal.model';
+import { geographicCoordinates, createBoundaries } from './geography';
+import { TEMPERATURE_STOPS } from './thermal-raster';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+import {
+  TemperatureGridService,
+} from '../../../../core/services/temperature-grid.service';
+
+import {
+  TEMPERATURE_TEXTURE_FACTORY,
+} from './temperature-texture';
 
 export interface GlobeLocation {
   latitude: number;
@@ -23,151 +38,126 @@ export type GlobeLayer = 'surface' | 'temperature';
 @Component({
   selector: 'app-earth-globe',
   standalone: true,
-  template: `
-    <div class="relative h-full min-h-[560px] w-full overflow-hidden bg-[#020817]">
-      <div
-        #globeContainer
-        class="absolute inset-0"
-        aria-label="Interactive three-dimensional Earth"
-      ></div>
-
-      <div class="absolute left-5 top-5 z-10 flex flex-col gap-2">
-        <button
-          type="button"
-          (click)="setLayer('surface')"
-          [class.border-sky-400]="activeLayer() === 'surface'"
-          [class.bg-sky-900]="activeLayer() === 'surface'"
-          class="rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-2 text-left text-sm text-white backdrop-blur-md hover:border-sky-500"
-        >
-          Earth Surface
-        </button>
-
-        <button
-          type="button"
-          disabled
-          title="Requires global gridded temperature observations"
-          class="cursor-not-allowed rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-2 text-left text-sm text-slate-500 opacity-75"
-        >
-          Temperature Overlay · Coming soon
-        </button>
-      </div>
-
-      <div
-        class="absolute right-5 top-5 z-10 flex flex-col overflow-hidden rounded-xl border border-sky-900 bg-slate-950/85 backdrop-blur-md"
-      >
-        <button
-          type="button"
-          (click)="zoomIn()"
-          aria-label="Zoom in"
-          class="border-b border-slate-700 px-4 py-3 text-xl text-white hover:bg-sky-900"
-        >
-          +
-        </button>
-
-        <button
-          type="button"
-          (click)="zoomOut()"
-          aria-label="Zoom out"
-          class="border-b border-slate-700 px-4 py-3 text-xl text-white hover:bg-sky-900"
-        >
-          −
-        </button>
-
-        <button
-          type="button"
-          (click)="resetView()"
-          aria-label="Reset globe view"
-          class="px-4 py-3 text-sm text-white hover:bg-sky-900"
-        >
-          Reset
-        </button>
-      </div>
-
-      @if (selectedLocation(); as location) {
-        <div
-          class="absolute bottom-20 right-5 z-10 rounded-xl border border-sky-500/40 bg-slate-950/90 px-4 py-3 text-sm text-white backdrop-blur-md"
-        >
-          <p class="font-semibold text-sky-300">
-            Selected location
-          </p>
-
-          <p class="mt-1">
-            {{ location.latitude }}°,
-            {{ location.longitude }}°
-          </p>
-
-          <p class="mt-1 text-xs text-slate-400">
-            Coordinates ready for climate analysis
-          </p>
-        </div>
-      }
-
-      <div
-        class="pointer-events-none absolute bottom-5 left-5 z-10 rounded-xl border border-sky-400/20 bg-slate-950/80 px-4 py-3 text-xs text-slate-300 backdrop-blur-md"
-      >
-        <p class="font-semibold text-sky-300">
-          Earth Explorer
-        </p>
-
-        <p class="mt-1">
-          Drag to rotate · Scroll to zoom
-        </p>
-
-        <p class="mt-1">
-          Double-click to select a location
-        </p>
-
-        <p class="mt-1 text-slate-400">
-          Geographic imagery · Not a temperature map
-        </p>
-      </div>
-    </div>
-  `,
+  imports: [ThermalControls],
+  templateUrl: './earth-globe.html',
+  styleUrl: './earth-globe.css',
 })
 export class EarthGlobe implements AfterViewInit, OnDestroy {
   @ViewChild('globeContainer', { static: true })
   private containerRef!: ElementRef<HTMLDivElement>;
+
+  private readonly temperatureService =
+    inject(TemperatureGridService);
+
+  // --------------------------------------------------
+  // INPUTS AND OUTPUTS
+  // --------------------------------------------------
+
+  private readonly createTexture = inject(TEMPERATURE_TEXTURE_FACTORY);
 
   readonly latitude = input(19.845);
   readonly longitude = input(-90.523);
 
   readonly locationSelected = output<GlobeLocation>();
 
-  readonly activeLayer = signal<GlobeLayer>('surface');
+  // --------------------------------------------------
+  // STATE
+  // --------------------------------------------------
+
+  readonly activeLayer = signal<GlobeLayer>('temperature');
 
   readonly selectedLocation =
     signal<GlobeLocation | null>(null);
 
+  readonly temperatureDate = signal('2024-06-15');
+  readonly provider = signal<ThermalProvider>('noaa');
+  readonly sources = signal<ThermalSource[]>([]);
+  readonly loadedGrid = signal<ThermalGrid | null>(null);
+  readonly boundaryWarning = signal<string | null>(null);
+  readonly webglError = signal<string | null>(null);
+  readonly legendTicks = [-20, -10, 0, 10, 20, 30, 40];
+  readonly legendGradient = 'linear-gradient(to right, ' + TEMPERATURE_STOPS.map(([t,r,g,b]) => `rgb(${r},${g},${b}) ${(t+20)/60*100}%`).join(', ') + ')';
+  private sourceSubscription?: Subscription;
+  private textureAbort?: AbortController;
+  private boundaryAbort = new AbortController();
+  private boundaries?: THREE.LineSegments;
+  private generation = 0;
+
+  readonly temperatureLoading = signal(false);
+
+  readonly temperatureError =
+    signal<string | null>(null);
+
+  readonly temperatureCount = signal(0);
+
+  readonly overlayOpacity = signal(100);
+
+  // --------------------------------------------------
+  // THREE.JS OBJECTS
+  // --------------------------------------------------
+
   private scene!: THREE.Scene;
+
   private camera!: THREE.PerspectiveCamera;
+
   private renderer!: THREE.WebGLRenderer;
+
   private controls!: OrbitControls;
 
   private earth!: THREE.Mesh;
-  private cloudMesh?: THREE.Mesh;
-  private marker?: THREE.Group;
+
+  private clouds?: THREE.Mesh;
+
+  private locationMarker?: THREE.Group;
+
+  private temperatureOverlay?: THREE.Mesh<
+    THREE.SphereGeometry,
+    THREE.MeshBasicMaterial
+  >;
+
+  private temperatureTexture?: THREE.DataTexture;
+
+  private temperatureSubscription?: Subscription;
 
   private readonly radius = 2;
 
-  // Distancia inicial ajustada para evitar que
-  // el planeta ocupe todo el panel.
   private readonly initialDistance = 6.2;
 
   private readonly textures: THREE.Texture[] = [];
 
   private animationFrame = 0;
+
   private resizeObserver?: ResizeObserver;
+
   private destroyed = false;
 
+  // --------------------------------------------------
+  // LIFECYCLE
+  // --------------------------------------------------
+
   ngAfterViewInit(): void {
-    this.initializeScene();
+    try { this.initializeScene(); }
+    catch { this.webglError.set('WebGL is unavailable. Enable hardware acceleration and reload.'); return; }
+
     this.createStars();
+
     this.createEarth();
+
     this.configureControls();
+
     this.configureResize();
+
     this.resetView();
+
     this.animate();
+    this.loadSources();
+    this.loadTemperatureOverlay();
+    this.loadBoundaries();
   }
+
+  // --------------------------------------------------
+  // SCENE INITIALIZATION
+  // --------------------------------------------------
 
   private initializeScene(): void {
     const container = this.containerRef.nativeElement;
@@ -208,7 +198,9 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
     this.renderer.outputColorSpace =
       THREE.SRGBColorSpace;
 
-    container.appendChild(this.renderer.domElement);
+    container.appendChild(
+      this.renderer.domElement,
+    );
 
     const ambientLight = new THREE.AmbientLight(
       0xffffff,
@@ -223,6 +215,7 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
     );
 
     sunlight.position.set(5, 3, 5);
+
     this.scene.add(sunlight);
 
     const rimLight = new THREE.DirectionalLight(
@@ -231,8 +224,13 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
     );
 
     rimLight.position.set(-4, -2, -4);
+
     this.scene.add(rimLight);
   }
+
+  // --------------------------------------------------
+  // EARTH
+  // --------------------------------------------------
 
   private createEarth(): void {
     const geometry = new THREE.SphereGeometry(
@@ -246,12 +244,16 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
       shininess: 18,
     });
 
-    this.earth = new THREE.Mesh(geometry, material);
+    this.earth = new THREE.Mesh(
+      geometry,
+      material,
+    );
 
     this.scene.add(this.earth);
 
     const loader = new THREE.TextureLoader();
 
+    // EARTH SURFACE
     loader.load(
       '/textures/earth/earth-surface.jpg',
       (texture) => {
@@ -270,6 +272,7 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
         this.textures.push(texture);
 
         material.map = texture;
+
         material.needsUpdate = true;
       },
       undefined,
@@ -281,6 +284,7 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
       },
     );
 
+    // SPECULAR MAP
     loader.load(
       '/textures/earth/earth-specular.jpg',
       (texture) => {
@@ -292,7 +296,11 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
         this.textures.push(texture);
 
         material.specularMap = texture;
-        material.specular = new THREE.Color(0x555555);
+
+        material.specular = new THREE.Color(
+          0x555555,
+        );
+
         material.needsUpdate = true;
       },
       undefined,
@@ -305,8 +313,16 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
     );
 
     this.createClouds(loader);
+
     this.createAtmosphere();
+
+    this.createTemperatureOverlay();
+    if (this.clouds) this.clouds.visible = false;
   }
+
+  // --------------------------------------------------
+  // CLOUDS
+  // --------------------------------------------------
 
   private createClouds(
     loader: THREE.TextureLoader,
@@ -320,16 +336,16 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
     const material = new THREE.MeshPhongMaterial({
       color: 0xffffff,
       transparent: true,
-      opacity: 0,
+      opacity: 0.35,
       depthWrite: false,
     });
 
-    this.cloudMesh = new THREE.Mesh(
+    this.clouds = new THREE.Mesh(
       geometry,
       material,
     );
 
-    this.scene.add(this.cloudMesh);
+    this.scene.add(this.clouds);
 
     loader.load(
       '/textures/earth/earth-clouds.png',
@@ -339,12 +355,15 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
           return;
         }
 
-        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.colorSpace =
+          THREE.SRGBColorSpace;
 
         this.textures.push(texture);
 
         material.map = texture;
+
         material.opacity = 0.28;
+
         material.needsUpdate = true;
       },
       undefined,
@@ -356,6 +375,10 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
       },
     );
   }
+
+  // --------------------------------------------------
+  // ATMOSPHERE
+  // --------------------------------------------------
 
   private createAtmosphere(): void {
     const geometry = new THREE.SphereGeometry(
@@ -370,7 +393,9 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
       side: THREE.BackSide,
       uniforms: {
         glowColor: {
-          value: new THREE.Color(0x38bdf8),
+          value: new THREE.Color(
+            0x38bdf8,
+          ),
         },
       },
       vertexShader: `
@@ -414,9 +439,54 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
     });
 
     this.scene.add(
-      new THREE.Mesh(geometry, material),
+      new THREE.Mesh(
+        geometry,
+        material,
+      ),
     );
   }
+
+  // --------------------------------------------------
+  // TEMPERATURE OVERLAY
+  // --------------------------------------------------
+
+  private createTemperatureOverlay(): void {
+    const geometry = new THREE.SphereGeometry(
+      this.radius * 1.006,
+      128,
+      96,
+    );
+
+    const material = new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: this.overlayOpacity() / 100,
+      depthWrite: false,
+      toneMapped: false,
+      side: THREE.FrontSide,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
+    });
+
+    this.temperatureOverlay = new THREE.Mesh(
+      geometry,
+      material,
+    );
+
+    this.temperatureOverlay.visible = false;
+
+    this.temperatureOverlay.renderOrder = 2;
+
+    // Attach the overlay to Earth so it stays
+    // aligned with geographic coordinates.
+    this.earth.add(
+      this.temperatureOverlay,
+    );
+  }
+
+  // --------------------------------------------------
+  // STARS
+  // --------------------------------------------------
 
   private createStars(): void {
     const count = 1400;
@@ -425,14 +495,20 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
       count * 3,
     );
 
-    for (let index = 0; index < count; index++) {
-      const theta = Math.random() * Math.PI * 2;
+    for (
+      let index = 0;
+      index < count;
+      index++
+    ) {
+      const theta =
+        Math.random() * Math.PI * 2;
 
       const phi = Math.acos(
         2 * Math.random() - 1,
       );
 
-      const distance = 25 + Math.random() * 35;
+      const distance =
+        25 + Math.random() * 35;
 
       positions[index * 3] =
         distance *
@@ -448,7 +524,8 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
         Math.sin(theta);
     }
 
-    const geometry = new THREE.BufferGeometry();
+    const geometry =
+      new THREE.BufferGeometry();
 
     geometry.setAttribute(
       'position',
@@ -458,19 +535,134 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
       ),
     );
 
-    const material = new THREE.PointsMaterial({
-      color: 0xb7d9ff,
-      size: 0.075,
-      transparent: true,
-      opacity: 0.85,
-      sizeAttenuation: true,
-      depthWrite: false,
-    });
+    const material =
+      new THREE.PointsMaterial({
+        color: 0xb7d9ff,
+        size: 0.075,
+        transparent: true,
+        opacity: 0.85,
+        sizeAttenuation: true,
+        depthWrite: false,
+      });
 
     this.scene.add(
-      new THREE.Points(geometry, material),
+      new THREE.Points(
+        geometry,
+        material,
+      ),
     );
   }
+
+  // --------------------------------------------------
+  // LAYER MANAGEMENT
+  // --------------------------------------------------
+
+  setLayer(layer: GlobeLayer): void {
+    this.activeLayer.set(layer);
+    if (this.clouds) this.clouds.visible = layer === 'surface';
+    if (this.boundaries) this.boundaries.visible = layer === 'temperature';
+    if (this.temperatureOverlay) this.temperatureOverlay.visible = layer === 'temperature' && !!this.temperatureTexture;
+    if (layer === 'temperature' && !this.temperatureTexture && !this.temperatureLoading()) this.loadTemperatureOverlay();
+  }
+
+  loadSources(): void {
+    this.sourceSubscription?.unsubscribe();
+    this.sourceSubscription = this.temperatureService.sources().subscribe({
+      next: sources => this.sources.set(sources),
+      error: () => this.temperatureError.set('Unable to load archive metadata. Check that FastAPI is running and retry.'),
+    });
+  }
+
+  changeProvider(provider: ThermalProvider): void {
+    const source = this.sources().find(s => s.id === provider && s.available);
+    if (!source) return;
+    this.provider.set(provider);
+    const current = this.temperatureDate();
+    if (source.dates && !source.dates.includes(current)) this.temperatureDate.set(source.dates[source.dates.length-1]);
+    else if (source.start && current < source.start) this.temperatureDate.set(source.start);
+    else if (source.end && current > source.end) this.temperatureDate.set(source.end);
+    this.loadTemperatureOverlay();
+  }
+
+  changeDate(date: string): void {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    this.temperatureDate.set(date);
+    this.loadTemperatureOverlay();
+  }
+
+  changeOpacity(value: number): void {
+    if (!Number.isFinite(value)) return;
+    this.overlayOpacity.set(THREE.MathUtils.clamp(value, 0, 100));
+    if (this.temperatureOverlay) this.temperatureOverlay.material.opacity = this.overlayOpacity()/100;
+  }
+
+  retry(): void { this.loadSources(); this.loadTemperatureOverlay(); }
+
+  loadTemperatureOverlay(): void {
+    if (this.destroyed || this.webglError()) return;
+    const generation = ++this.generation;
+    this.temperatureSubscription?.unsubscribe();
+    this.textureAbort?.abort();
+    const abort = new AbortController();
+    this.textureAbort = abort;
+    this.temperatureLoading.set(true);
+    this.temperatureError.set(null);
+    this.loadedGrid.set(null);
+    this.temperatureCount.set(0);
+    if (this.temperatureOverlay) {
+      this.temperatureOverlay.visible = false;
+      this.temperatureOverlay.material.map = null;
+      this.temperatureOverlay.material.needsUpdate = true;
+    }
+    this.temperatureTexture?.dispose();
+    this.temperatureTexture = undefined;
+    const date = this.temperatureDate(), provider = this.provider();
+    this.temperatureSubscription = this.temperatureService.getTemperatureGrid(date, provider).subscribe({
+      next: async response => {
+        try {
+          if (response.date !== date || response.provider !== provider) throw new Error('Server returned a different date or data source.');
+          const texture = await this.createTexture(response, abort.signal);
+          if (this.destroyed || generation !== this.generation) { texture.dispose(); return; }
+          this.temperatureTexture = texture;
+          this.loadedGrid.set(response);
+          this.temperatureCount.set(response.valid_cells);
+          if (this.temperatureOverlay) {
+            this.temperatureOverlay.material.map = texture;
+            this.temperatureOverlay.material.needsUpdate = true;
+            this.temperatureOverlay.visible = this.activeLayer() === 'temperature';
+          }
+        } catch (error) {
+          if (!abort.signal.aborted && generation === this.generation) this.temperatureError.set(error instanceof Error ? error.message : 'Unable to process global grid.');
+        } finally {
+          if (generation === this.generation && !this.destroyed) this.temperatureLoading.set(false);
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        if (this.destroyed || generation !== this.generation) return;
+        this.temperatureLoading.set(false);
+        const detail = error.error?.detail;
+        this.temperatureError.set(typeof detail === 'string' ? detail : 'Unable to load this date. Check FastAPI and the archive connection.');
+      },
+    });
+  }
+
+  private async loadBoundaries(): Promise<void> {
+    try {
+      const response = await fetch('/geography/countries-110m.geojson', {signal: this.boundaryAbort.signal});
+      if (!response.ok) throw new Error('Boundary asset unavailable');
+      const data = await response.json();
+      if (this.destroyed) return;
+      this.boundaries = createBoundaries(data, this.radius*1.008);
+      this.boundaries.visible = this.activeLayer() === 'temperature';
+      this.earth.add(this.boundaries);
+    } catch {
+      if (!this.destroyed) this.boundaryWarning.set('Country outlines unavailable. Temperature data remain valid.');
+    }
+  }
+
+  // --------------------------------------------------
+  // ORBIT CONTROLS
+  // --------------------------------------------------
 
   private configureControls(): void {
     this.controls = new OrbitControls(
@@ -479,14 +671,17 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
     );
 
     this.controls.enableDamping = true;
+
     this.controls.dampingFactor = 0.055;
 
     this.controls.enablePan = false;
 
     this.controls.minDistance = 2.8;
+
     this.controls.maxDistance = 11;
 
     this.controls.rotateSpeed = 0.65;
+
     this.controls.zoomSpeed = 0.8;
 
     this.renderer.domElement.addEventListener(
@@ -495,60 +690,68 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
     );
   }
 
+  // --------------------------------------------------
+  // LOCATION PICKING
+  // --------------------------------------------------
+
   private readonly handleDoubleClick = (
     event: MouseEvent,
   ): void => {
     const bounds =
-      this.renderer.domElement.getBoundingClientRect();
+      this.renderer.domElement
+        .getBoundingClientRect();
+
+    if (
+      bounds.width === 0 ||
+      bounds.height === 0
+    ) {
+      return;
+    }
 
     const pointer = new THREE.Vector2(
-      ((event.clientX - bounds.left) / bounds.width) *
-        2 -
-        1,
+      (
+        (event.clientX - bounds.left) /
+        bounds.width
+      ) * 2 - 1,
       -(
         (event.clientY - bounds.top) /
         bounds.height
-      ) *
-        2 +
-        1,
+      ) * 2 + 1,
     );
 
-    const raycaster = new THREE.Raycaster();
+    const raycaster =
+      new THREE.Raycaster();
 
     raycaster.setFromCamera(
       pointer,
       this.camera,
     );
 
-    const intersections = raycaster.intersectObject(
-      this.earth,
-    );
+    // Raycast only the Earth surface.
+    const intersections =
+      raycaster.intersectObject(
+        this.earth,
+        false,
+      );
 
-    if (!intersections.length) {
+    if (
+      intersections.length === 0
+    ) {
       return;
     }
 
-    const intersection = intersections[0];
+    const intersection =
+      intersections[0];
 
     const localPoint = this.earth
-      .worldToLocal(intersection.point.clone())
+      .worldToLocal(
+        intersection.point.clone(),
+      )
       .normalize();
 
-    const latitude = THREE.MathUtils.radToDeg(
-      Math.asin(localPoint.y),
-    );
-
-    const longitude = intersection.uv
-      ? (intersection.uv.x - 0.5) * 360
-      : THREE.MathUtils.radToDeg(
-          Math.atan2(
-            -localPoint.z,
-            localPoint.x,
-          ),
-        );
-
-    const normalizedLongitude =
-      ((longitude + 540) % 360) - 180;
+    const coordinates = geographicCoordinates(localPoint);
+    const latitude = coordinates.latitude;
+    const normalizedLongitude = ((coordinates.longitude + 540) % 360) - 180;
 
     const location: GlobeLocation = {
       latitude: Number(
@@ -559,129 +762,99 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
       ),
     };
 
-    this.selectedLocation.set(location);
+    this.selectedLocation.set(
+      location,
+    );
 
-    this.updateMarker(localPoint);
+    this.updateLocationMarker(
+      localPoint,
+    );
 
-    this.locationSelected.emit(location);
+    this.locationSelected.emit(
+      location,
+    );
   };
 
-  private updateMarker(
+  // --------------------------------------------------
+  // LOCATION MARKER
+  // --------------------------------------------------
+
+  private updateLocationMarker(
     localPoint: THREE.Vector3,
   ): void {
-    if (!this.marker) {
-      this.marker = new THREE.Group();
+    if (!this.locationMarker) {
+      this.locationMarker =
+        new THREE.Group();
 
-      this.earth.add(this.marker);
-
-      const dotGeometry = new THREE.SphereGeometry(
-        0.035,
-        16,
-        12,
+      this.earth.add(
+        this.locationMarker,
       );
 
-      const dotMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-      });
+      const dotGeometry =
+        new THREE.SphereGeometry(
+          0.035,
+          16,
+          12,
+        );
+
+      const dotMaterial =
+        new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+        });
 
       const dot = new THREE.Mesh(
         dotGeometry,
         dotMaterial,
       );
 
-      this.marker.add(dot);
+      this.locationMarker.add(dot);
 
-      const ringGeometry = new THREE.RingGeometry(
-        0.055,
-        0.085,
-        32,
-      );
+      const ringGeometry =
+        new THREE.RingGeometry(
+          0.055,
+          0.085,
+          32,
+        );
 
-      const ringMaterial = new THREE.MeshBasicMaterial({
-        color: 0x00c8ff,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.95,
-        depthWrite: false,
-      });
+      const ringMaterial =
+        new THREE.MeshBasicMaterial({
+          color: 0x00c8ff,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.95,
+          depthWrite: false,
+        });
 
       const ring = new THREE.Mesh(
         ringGeometry,
         ringMaterial,
       );
 
-      this.marker.add(ring);
+      this.locationMarker.add(ring);
     }
 
-    this.marker.position.copy(
+    this.locationMarker.position.copy(
       localPoint
         .clone()
         .multiplyScalar(
-          this.radius * 1.035,
+          this.radius * 1.045,
         ),
     );
 
-    this.marker.quaternion.setFromUnitVectors(
-      new THREE.Vector3(0, 0, 1),
-      localPoint,
-    );
+    this.locationMarker.quaternion
+      .setFromUnitVectors(
+        new THREE.Vector3(
+          0,
+          0,
+          1,
+        ),
+        localPoint,
+      );
   }
 
-  private configureResize(): void {
-    const container = this.containerRef.nativeElement;
-
-    this.resizeObserver = new ResizeObserver(() => {
-      const width = Math.max(
-        container.clientWidth,
-        1,
-      );
-
-      const height = Math.max(
-        container.clientHeight,
-        1,
-      );
-
-      this.camera.aspect = width / height;
-
-      this.camera.updateProjectionMatrix();
-
-      this.renderer.setSize(
-        width,
-        height,
-      );
-    });
-
-    this.resizeObserver.observe(container);
-  }
-
-  private animate = (): void => {
-    if (this.destroyed) {
-      return;
-    }
-
-    this.animationFrame = requestAnimationFrame(
-      this.animate,
-    );
-
-    this.controls.update();
-
-    if (this.cloudMesh) {
-      this.cloudMesh.rotation.y += 0.00012;
-    }
-
-    this.renderer.render(
-      this.scene,
-      this.camera,
-    );
-  };
-
-  setLayer(layer: GlobeLayer): void {
-    if (layer !== 'surface') {
-      return;
-    }
-
-    this.activeLayer.set('surface');
-  }
+  // --------------------------------------------------
+  // CAMERA
+  // --------------------------------------------------
 
   zoomIn(): void {
     this.setZoom(0.8);
@@ -692,7 +865,6 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
   }
 
   resetView(): void {
-    // Restaurar la distancia inicial.
     this.camera.position.set(
       0,
       0,
@@ -707,16 +879,14 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
 
     this.controls.update();
 
-    // Orientación inicial hacia América.
     this.earth.rotation.set(
       0,
       -Math.PI / 2,
       0,
     );
 
-    // Sincronizar las nubes con la Tierra.
-    if (this.cloudMesh) {
-      this.cloudMesh.rotation.copy(
+    if (this.clouds) {
+      this.clouds.rotation.copy(
         this.earth.rotation,
       );
     }
@@ -742,8 +912,81 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
     this.controls.update();
   }
 
+  // --------------------------------------------------
+  // RESIZE
+  // --------------------------------------------------
+
+  private configureResize(): void {
+    const container =
+      this.containerRef.nativeElement;
+
+    this.resizeObserver =
+      new ResizeObserver(() => {
+        const width = Math.max(
+          container.clientWidth,
+          1,
+        );
+
+        const height = Math.max(
+          container.clientHeight,
+          1,
+        );
+
+        this.camera.aspect =
+          width / height;
+
+        this.camera.updateProjectionMatrix();
+
+        this.renderer.setSize(
+          width,
+          height,
+        );
+      });
+
+    this.resizeObserver.observe(
+      container,
+    );
+  }
+
+  // --------------------------------------------------
+  // ANIMATION
+  // --------------------------------------------------
+
+  private animate = (): void => {
+    if (this.destroyed) {
+      return;
+    }
+
+    this.animationFrame =
+      requestAnimationFrame(
+        this.animate,
+      );
+
+    this.controls.update();
+
+    if (this.clouds) {
+      this.clouds.rotation.y +=
+        0.00012;
+    }
+
+    this.renderer.render(
+      this.scene,
+      this.camera,
+    );
+  };
+
+  // --------------------------------------------------
+  // CLEANUP
+  // --------------------------------------------------
+
   ngOnDestroy(): void {
     this.destroyed = true;
+
+    this.temperatureSubscription?.unsubscribe();
+    this.sourceSubscription?.unsubscribe();
+    this.textureAbort?.abort();
+    this.boundaryAbort.abort();
+    this.generation++;
 
     cancelAnimationFrame(
       this.animationFrame,
@@ -751,33 +994,48 @@ export class EarthGlobe implements AfterViewInit, OnDestroy {
 
     this.resizeObserver?.disconnect();
 
-    this.renderer?.domElement.removeEventListener(
-      'dblclick',
-      this.handleDoubleClick,
-    );
+    this.renderer?.domElement
+      .removeEventListener(
+        'dblclick',
+        this.handleDoubleClick,
+      );
 
     this.controls?.dispose();
 
-    this.scene?.traverse((object) => {
-      if (
-        object instanceof THREE.Mesh ||
-        object instanceof THREE.Points
-      ) {
-        object.geometry.dispose();
+    if (this.temperatureOverlay) {
+      this.temperatureOverlay.material.map =
+        null;
+    }
 
-        const materials = Array.isArray(
-          object.material,
-        )
-          ? object.material
-          : [object.material];
+    this.temperatureTexture?.dispose();
 
-        for (const material of materials) {
-          material.dispose();
+    this.scene?.traverse(
+      (object) => {
+        if (
+          object instanceof THREE.Mesh ||
+          object instanceof THREE.Points || object instanceof THREE.LineSegments
+        ) {
+          object.geometry.dispose();
+
+          const materials =
+            Array.isArray(
+              object.material,
+            )
+              ? object.material
+              : [object.material];
+
+          for (
+            const material of materials
+          ) {
+            material.dispose();
+          }
         }
-      }
-    });
+      },
+    );
 
-    for (const texture of this.textures) {
+    for (
+      const texture of this.textures
+    ) {
       texture.dispose();
     }
 

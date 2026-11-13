@@ -1,0 +1,34 @@
+<div class="toolbar">
+  <div class="heading"><span class="eyebrow">GLOBAL REANALYSIS</span><h2>Air temperature <span>/ 2 m</span></h2></div>
+  <div class="modes" aria-label="Globe display mode">
+    <button (click)="layerChange.emit('temperature')" [attr.aria-pressed]="layer() === 'temperature'">Thermal</button>
+    <button (click)="layerChange.emit('surface')" [attr.aria-pressed]="layer() === 'surface'">Surface</button>
+  </div>
+</div>
+@if (layer() === 'temperature') {
+  <div class="settings">
+    <label>DATA SOURCE
+      <select aria-label="Temperature data source" [value]="provider()" (change)="selectProvider($event)">
+        @for (s of sources(); track s.id) { <option [value]="s.id" [disabled]="!s.available">{{s.name}}{{s.available ? '' : ' · import required'}}</option> }
+      </select>
+    </label>
+    <label>DAILY MEAN · UTC
+      @if (provider() === 'merra2') {
+        <select aria-label="Temperature date" [value]="date()" (change)="dateChange.emit(value($event))">
+          @for (d of source()?.dates ?? []; track d) { <option [value]="d">{{ d }}</option> }
+        </select>
+      } @else {
+        <input type="date" aria-label="Temperature date" [min]="source()?.start ?? '1948-01-01'" [max]="source()?.end ?? '2026-03-17'" [value]="date()" (change)="dateChange.emit(value($event))" />
+      }
+    </label>
+    <label class="opacity">OPACITY <span>{{opacity()}}%</span>
+      <input type="range" aria-label="Thermal opacity" min="0" max="100" step="1" [value]="opacity()" (input)="selectOpacity($event)" />
+    </label>
+  </div>
+  <div class="status" aria-live="polite">
+    @if (loading()) { <span class="loading">Loading {{date()}} · global temperature grid…</span> }
+    @else if (error(); as message) { <span role="alert">{{message}} <button (click)="retry.emit()">Retry</button></span> }
+    @else if (grid(); as data) { <span>{{data.source}} · {{data.date}} · {{data.valid_cells}} valid cells</span> }
+    <small>{{source()?.note}}</small>
+  </div>
+}
