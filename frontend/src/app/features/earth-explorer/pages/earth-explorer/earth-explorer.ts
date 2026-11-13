@@ -12,15 +12,19 @@ import type {
 } from '../../../../core/models/climate.model';
 
 import { EarthGlobe } from '../../components/earth-globe/earth-globe';
+
 import {
   LocationSelector,
 } from '../../../dashboard/components/location-selector/location-selector';
+
 import type {
   SelectedCoordinates,
 } from '../../../dashboard/components/location-selector/location-selector';
+
 import {
   ClimateChart,
 } from '../../../dashboard/components/climate-chart/climate-chart';
+
 import {
   TrendSummary,
 } from '../../../dashboard/components/trend-summary/trend-summary';
@@ -47,23 +51,45 @@ import {
           class="mx-auto flex max-w-[1800px] flex-wrap
                  items-center justify-between gap-5 px-5 py-5 lg:px-8"
         >
-          <div>
-            <p
-              class="text-xs font-medium uppercase
-                     tracking-[0.24em] text-sky-400"
-            >
-              NASA Space Apps Challenge 2026
-            </p>
+          <!-- NASA BRAND -->
+          <div class="flex min-w-0 items-center gap-4 sm:gap-5">
+            <img
+              src="/logo/nasa-logo.webp"
+              alt="NASA emblem"
+              width="80"
+              height="80"
+              class="h-16 w-16 shrink-0 rounded-full object-cover
+                     ring-1 ring-white/15 sm:h-20 sm:w-20"
+            />
 
-            <h1 class="mt-2 text-2xl font-semibold">
-              EarthTrend NASA
-            </h1>
+            <div class="min-w-0">
+              <p
+                class="text-[10px] font-semibold uppercase
+                       tracking-[0.23em] text-sky-400 sm:text-xs"
+              >
+                NASA Space Apps Challenge 2026
+              </p>
 
-            <p class="mt-1 text-sm text-slate-400">
-              Earth System Climate Explorer
-            </p>
+              <h1
+                class="mt-1.5 text-2xl font-black uppercase
+                       leading-none tracking-[0.13em] text-white
+                       sm:text-3xl lg:text-[34px]"
+                style="font-family: 'Arial Black', 'Arial', sans-serif"
+              >
+                EarthTrend
+                <span class="text-sky-400">NASA</span>
+              </h1>
+
+              <p
+                class="mt-2 text-[11px] font-medium uppercase
+                       tracking-[0.18em] text-slate-400 sm:text-xs"
+              >
+                Earth System Climate Explorer
+              </p>
+            </div>
           </div>
 
+          <!-- NAVIGATION -->
           <nav
             class="flex flex-wrap items-center gap-3"
             aria-label="Main navigation"
