@@ -1,0 +1,43 @@
+<div class="globe-shell">
+  <app-thermal-controls
+    [layer]="activeLayer()" [sources]="sources()" [provider]="provider()"
+    [date]="temperatureDate()" [opacity]="overlayOpacity()"
+    [loading]="temperatureLoading()" [error]="temperatureError()" [grid]="loadedGrid()"
+    (layerChange)="setLayer($event)" (providerChange)="changeProvider($event)"
+    (dateChange)="changeDate($event)" (opacityChange)="changeOpacity($event)" (retry)="retry()" />
+  <div class="viewport">
+    <div #globeContainer class="canvas-host" aria-label="Interactive Earth: drag to rotate, scroll to zoom, double-click to select coordinates"></div>
+    <div class="camera-controls">
+      <button type="button" (click)="zoomIn()" [disabled]="!!webglError()" aria-label="Zoom in">+</button>
+      <button type="button" (click)="zoomOut()" [disabled]="!!webglError()" aria-label="Zoom out">−</button>
+      <button type="button" (click)="resetView()" [disabled]="!!webglError()" aria-label="Reset globe view">↺</button>
+    </div>
+    <div class="canvas-label">{{activeLayer() === 'temperature' ? 'AIR TEMPERATURE · ABSOLUTE' : 'EARTH SURFACE'}}
+      <span>{{activeLayer() === 'temperature' ? (loadedGrid()?.date ?? 'Awaiting data') : 'Geographic imagery'}}</span>
+    </div>
+    @if (webglError(); as error) { <div class="canvas-error" role="alert">{{error}}</div> }
+    @if (activeLayer() === 'temperature' && temperatureLoading()) { <div class="processing" role="status">Preparing global field…</div> }
+    @if (activeLayer() === 'temperature' && temperatureError() && !temperatureLoading() && !loadedGrid()) { <div class="processing">Thermal data unavailable · surface shown</div> }
+  </div>
+  <div class="globe-footer">
+    @if (activeLayer() === 'temperature') {
+      <div class="legend" aria-label="Temperature color scale, absolute Celsius">
+        <div class="legend-heading"><span>Daily mean air temperature</span><strong>°C</strong></div>
+        <div class="colorbar" [style.background]="legendGradient"></div>
+        <div class="ticks">@for (tick of legendTicks; track tick) { <span>{{tick === -20 ? '≤' : tick === 40 ? '≥' : ''}}{{tick}}</span> }</div>
+        <p>Fixed scale · extremes clipped to end colors · transparent = no data</p>
+        @if (overlayOpacity() < 100) { <p>Blended colors · use 100% opacity to read the color scale.</p> }
+      </div>
+      @if (loadedGrid(); as grid) {
+        <div class="provenance"><span>{{grid.resolution}}</span><span>Range: {{grid.minimum}} to {{grid.maximum}} °C</span>
+          <small>Reanalysis · display resampling does not add spatial detail.</small>
+          @if (grid.provider === 'noaa') { <small>Polar caps beyond ±88.542° extend the nearest grid row.</small> }
+        </div>
+      }
+    }
+    <div class="interaction"><span>Drag to rotate · Scroll to zoom · Double-click to select</span>
+      @if (selectedLocation(); as location) { <strong>Selected: {{location.latitude}}°, {{location.longitude}}° · ready for historical analysis</strong> }
+      @if (boundaryWarning(); as warning) { <span role="status">{{warning}}</span> }
+    </div>
+  </div>
+</div>

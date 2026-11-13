@@ -2,6 +2,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { API_URL } from './api-url';
 
 import {
   ClimateQuery,
@@ -15,7 +16,7 @@ import {
 export class ClimateApiService {
   private readonly http = inject(HttpClient);
 
-  private readonly baseUrl = 'http://127.0.0.1:8000/api/v1';
+  private readonly baseUrl = inject(API_URL);
 
   getTemperatures(
     query: ClimateQuery,

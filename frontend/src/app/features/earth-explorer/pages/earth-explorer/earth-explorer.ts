@@ -186,13 +186,13 @@ import {
                 </h2>
 
                 <p class="mt-3 text-sm leading-6 text-slate-300">
-                  NASA POWER provides annual temperature
-                  observations for individual geographic coordinates.
+                  NOAA provides global daily air temperature at 2 m.
+                  NASA MERRA-2 is available after importing authenticated downloads.
                 </p>
 
                 <p class="mt-3 text-xs leading-5 text-slate-400">
-                  The geographic Earth texture is not
-                  a global temperature visualization.
+                  The thermal layer uses a complete reanalysis grid.
+                  It is independent of the point-based historical analysis.
                 </p>
               </section>
             </aside>
@@ -258,7 +258,7 @@ import {
                     </p>
 
                     <p class="mt-2 text-sm text-slate-400">
-                      Coming soon
+                      Global daily mean · available
                     </p>
                   </div>
                 </div>
@@ -277,8 +277,8 @@ import {
                 </p>
 
                 <p class="mt-2 text-xs leading-6 text-slate-400">
-                  Climate observations are retrieved through
-                  the EarthTrend NASA FastAPI backend.
+                  Global map: NOAA / NCEP–NCAR or imported MERRA-2.
+                  Historical coordinate analysis: NASA POWER.
                 </p>
               </section>
 
@@ -572,7 +572,7 @@ import {
 export class EarthExplorer {
   private readonly climateApi = inject(ClimateApiService);
 
-  readonly immersive = signal(false);
+  readonly immersive = signal(true);
   readonly chartExpanded = signal(false);
 
   readonly selectedCoordinates =
