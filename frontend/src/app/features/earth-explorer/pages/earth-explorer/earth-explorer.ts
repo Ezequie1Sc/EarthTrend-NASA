@@ -1,39 +1,26 @@
 
-import {
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 
-import {
-  ClimateApiService,
-} from '../../../../core/services/climate-api.service';
-
+import { ClimateApiService } from '../../../../core/services/climate-api.service';
 import type {
   ClimateQuery,
   TrendAnalysisResponse,
 } from '../../../../core/models/climate.model';
 
-import {
-  EarthGlobe,
-} from '../../components/earth-globe/earth-globe';
-
+import { EarthGlobe } from '../../components/earth-globe/earth-globe';
 import {
   LocationSelector,
 } from '../../../dashboard/components/location-selector/location-selector';
-
 import type {
   SelectedCoordinates,
 } from '../../../dashboard/components/location-selector/location-selector';
-
 import {
   ClimateChart,
 } from '../../../dashboard/components/climate-chart/climate-chart';
-
 import {
   TrendSummary,
 } from '../../../dashboard/components/trend-summary/trend-summary';
@@ -50,14 +37,15 @@ import {
     TrendSummary,
   ],
   template: `
-    <main class="min-h-screen bg-[#030b19] text-white">
-
+    <main
+      class="min-h-screen bg-[#030b19] text-white"
+      aria-label="EarthTrend NASA Earth Explorer"
+    >
       <!-- HEADER -->
       <header class="border-b border-sky-900/60 bg-[#061225]">
         <div
-          class="mx-auto flex max-w-[1800px]
-                 flex-wrap items-center justify-between
-                 gap-5 px-5 py-5 lg:px-8"
+          class="mx-auto flex max-w-[1800px] flex-wrap
+                 items-center justify-between gap-5 px-5 py-5 lg:px-8"
         >
           <div>
             <p
@@ -82,9 +70,10 @@ import {
           >
             <a
               routerLink="/explorer"
+              aria-current="page"
               class="rounded-xl border border-sky-500/70
-                     bg-sky-950 px-4 py-2.5
-                     text-sm font-medium text-sky-200"
+                     bg-sky-950 px-4 py-2.5 text-sm
+                     font-medium text-sky-200"
             >
               Earth Explorer
             </a>
@@ -102,9 +91,14 @@ import {
             <button
               type="button"
               (click)="toggleImmersive()"
+              [attr.aria-pressed]="immersive()"
+              aria-label="Toggle immersive Earth visualization"
               class="rounded-xl bg-sky-600 px-4 py-2.5
                      text-sm font-medium transition
-                     hover:bg-sky-500"
+                     hover:bg-sky-500
+                     focus-visible:outline-2
+                     focus-visible:outline-offset-2
+                     focus-visible:outline-sky-400"
             >
               {{ immersive() ? 'Show panels' : 'Immersive view' }}
             </button>
@@ -114,8 +108,8 @@ import {
 
       <!-- EARTH EXPLORER -->
       <section
-        class="mx-auto max-w-[1800px]
-               px-5 py-6 lg:px-8"
+        aria-label="Interactive Earth visualization"
+        class="mx-auto max-w-[1800px] px-5 py-6 lg:px-8"
       >
         <div
           [class]="
@@ -124,11 +118,9 @@ import {
               : 'grid grid-cols-1 items-start gap-5 xl:grid-cols-[300px_minmax(0,1fr)_280px]'
           "
         >
-
           <!-- LEFT SIDEBAR -->
           @if (!immersive()) {
             <aside class="min-w-0 space-y-5">
-
               <section
                 class="rounded-2xl border border-sky-900/70
                        bg-[#091a30] p-5"
@@ -158,8 +150,7 @@ import {
 
                 <div
                   class="mt-5 rounded-xl border
-                         border-sky-900/60
-                         bg-[#102743] p-4"
+                         border-sky-900/60 bg-[#102743] p-4"
                 >
                   <p
                     class="text-xs font-semibold uppercase
@@ -209,9 +200,6 @@ import {
 
           <!-- 3D GLOBE -->
           <div
-            class="relative min-w-0 overflow-hidden
-                   rounded-2xl border border-sky-900/70
-                   bg-[#020817]"
             [class]="
               immersive()
                 ? 'relative min-w-0 min-h-[calc(100vh-150px)] overflow-hidden rounded-2xl border border-sky-900/70 bg-[#020817]'
@@ -226,7 +214,6 @@ import {
           <!-- RIGHT SIDEBAR -->
           @if (!immersive()) {
             <aside class="min-w-0 space-y-5">
-
               <section
                 class="rounded-2xl border border-sky-900/70
                        bg-[#091a30] p-5"
@@ -335,8 +322,8 @@ import {
       @if (!immersive()) {
         <section
           id="climate-analysis"
-          class="mx-auto max-w-[1800px]
-                 px-5 pb-12 lg:px-8"
+          aria-labelledby="climate-analysis-heading"
+          class="mx-auto max-w-[1800px] px-5 pb-12 lg:px-8"
         >
           <div
             class="mb-6 flex flex-wrap items-end
@@ -350,7 +337,10 @@ import {
                 Scientific workspace
               </p>
 
-              <h2 class="mt-2 text-2xl font-semibold">
+              <h2
+                id="climate-analysis-heading"
+                class="mt-2 text-2xl font-semibold"
+              >
                 Climate Analysis
               </h2>
 
@@ -373,14 +363,7 @@ import {
             </span>
           </div>
 
-          <!--
-            NORMAL:
-              360px form + flexible chart
-
-            EXPANDED:
-              One full-width column.
-              Chart first, horizontal form second.
-          -->
+          <!-- RESPONSIVE WORKSPACE -->
           <div
             [class]="
               chartExpanded()
@@ -388,8 +371,7 @@ import {
                 : 'grid w-full min-w-0 grid-cols-1 items-start gap-5 lg:grid-cols-[360px_minmax(0,1fr)]'
             "
           >
-
-            <!-- FORM: NEVER DESTROYED -->
+            <!-- FORM -->
             <div
               [class]="
                 chartExpanded()
@@ -436,7 +418,6 @@ import {
                     and calculating statistical trends.
                   </p>
                 </div>
-
               } @else if (error()) {
                 <div
                   role="alert"
@@ -455,14 +436,12 @@ import {
                     Check that the FastAPI backend is running.
                   </p>
                 </div>
-
               } @else if (analysis(); as result) {
                 <app-climate-chart
                   [data]="result"
                   [expanded]="chartExpanded()"
                   (expandedChange)="chartExpanded.set($event)"
                 />
-
               } @else {
                 <div
                   class="flex min-h-[360px] flex-col
@@ -500,7 +479,10 @@ import {
 
           <!-- CLIMATE INSIGHTS -->
           @if (analysis(); as result) {
-            <section class="mt-8">
+            <section
+              class="mt-8"
+              aria-labelledby="climate-insights-heading"
+            >
               <div class="mb-5">
                 <p
                   class="text-xs font-semibold uppercase
@@ -509,7 +491,10 @@ import {
                   Statistical interpretation
                 </p>
 
-                <h2 class="mt-2 text-2xl font-semibold">
+                <h2
+                  id="climate-insights-heading"
+                  class="mt-2 text-2xl font-semibold"
+                >
                   Climate Insights
                 </h2>
 
@@ -605,9 +590,7 @@ export class EarthExplorer {
     this.immersive.update(value => !value);
   }
 
-  onLocationSelected(
-    location: SelectedCoordinates,
-  ): void {
+  onLocationSelected(location: SelectedCoordinates): void {
     if (
       !Number.isFinite(location.latitude) ||
       !Number.isFinite(location.longitude) ||
@@ -619,7 +602,6 @@ export class EarthExplorer {
       return;
     }
 
-    // Invalidate any pending request for a previous location.
     this.requestVersion++;
 
     this.selectedCoordinates.set({
@@ -658,7 +640,6 @@ export class EarthExplorer {
 
           this.analysis.set(analysis);
         },
-
         error: (error: unknown) => {
           if (version !== this.requestVersion) {
             return;
