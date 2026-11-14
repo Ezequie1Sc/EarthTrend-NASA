@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 
 import { ClimateApiService } from '../../../../core/services/climate-api.service';
+
 import type {
   ClimateQuery,
   TrendAnalysisResponse,
@@ -32,6 +33,7 @@ import {
 @Component({
   selector: 'app-earth-explorer',
   standalone: true,
+
   imports: [
     RouterLink,
     DecimalPipe,
@@ -40,18 +42,246 @@ import {
     ClimateChart,
     TrendSummary,
   ],
+
+  styles: [`
+    :host {
+      display: block;
+      background: #030b19;
+    }
+
+    /* ==========================================
+       MINIMAL NASA FOOTER
+       ========================================== */
+
+    .nasa-footer {
+      background: #06111f;
+      border-top: 1px solid rgba(148, 163, 184, 0.12);
+      color: #f8fafc;
+    }
+
+    .nasa-footer-container {
+      width: 100%;
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 60px clamp(24px, 4vw, 64px) 28px;
+    }
+
+    .nasa-footer-main {
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1.5fr)
+        repeat(2, minmax(0, 0.7fr));
+      gap: clamp(35px, 5vw, 90px);
+      padding-bottom: 55px;
+    }
+
+    /* BRAND */
+
+    .nasa-footer-brand {
+      max-width: 460px;
+    }
+
+    .nasa-footer-identity {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nasa-footer-logo {
+      width: 58px;
+      height: 58px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      object-fit: contain;
+    }
+
+    .nasa-footer-title {
+      margin: 0;
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: clamp(19px, 2vw, 25px);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+      color: #f8fafc;
+    }
+
+    .nasa-footer-title span {
+      color: #a6cfe7;
+    }
+
+    .nasa-footer-subtitle {
+      margin: 7px 0 0;
+      color: #8298ad;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .nasa-footer-description {
+      max-width: 410px;
+      margin: 24px 0 0;
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.9;
+    }
+
+    /* NAVIGATION */
+
+    .nasa-footer-column h3 {
+      margin: 0 0 24px;
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .nasa-footer-column nav {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 17px;
+    }
+
+    .nasa-footer-column nav a {
+      color: #94a3b8;
+      font-size: 13px;
+      line-height: 1.5;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .nasa-footer-column nav a:hover {
+      color: #e0f2fe;
+    }
+
+    .nasa-footer-column nav a:focus-visible,
+    .nasa-footer-developer:focus-visible {
+      outline: 2px solid #7dd3fc;
+      outline-offset: 5px;
+      border-radius: 3px;
+    }
+
+    /* BOTTOM */
+
+    .nasa-footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding-top: 26px;
+      border-top: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .nasa-footer-copyright {
+      margin: 0;
+      color: #8192a6;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .nasa-footer-developer {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #94a3b8;
+      font-size: 12px;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .nasa-footer-developer:hover {
+      color: #f8fafc;
+    }
+
+    .nasa-footer-developer strong {
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    .nasa-footer-developer svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+    }
+
+    .nasa-footer-disclaimer {
+      max-width: 900px;
+      margin: 18px 0 0;
+      color: #65788e;
+      font-size: 11px;
+      line-height: 1.8;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 900px) {
+      .nasa-footer-main {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 42px;
+      }
+
+      .nasa-footer-brand {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .nasa-footer-container {
+        padding: 45px 22px 25px;
+      }
+
+      .nasa-footer-main {
+        grid-template-columns: 1fr;
+        gap: 38px;
+        padding-bottom: 40px;
+      }
+
+      .nasa-footer-brand {
+        grid-column: auto;
+      }
+
+      .nasa-footer-logo {
+        width: 52px;
+        height: 52px;
+      }
+
+      .nasa-footer-title {
+        font-size: 21px;
+      }
+
+      .nasa-footer-bottom {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nasa-footer-column nav a,
+      .nasa-footer-developer {
+        transition: none;
+      }
+    }
+  `],
+
   template: `
     <main
       class="min-h-screen bg-[#030b19] text-white"
       aria-label="EarthTrend NASA Earth Explorer"
     >
-      <!-- HEADER -->
+
+      <!-- ======================================
+           HEADER
+           ====================================== -->
+
       <header class="border-b border-sky-900/60 bg-[#061225]">
         <div
           class="mx-auto flex max-w-[1800px] flex-wrap
                  items-center justify-between gap-5 px-5 py-5 lg:px-8"
         >
-          <!-- NASA BRAND -->
           <div class="flex min-w-0 items-center gap-4 sm:gap-5">
             <img
               src="/logo/nasa-logo.webp"
@@ -74,10 +304,9 @@ import {
                 class="mt-1.5 text-2xl font-black uppercase
                        leading-none tracking-[0.13em] text-white
                        sm:text-3xl lg:text-[34px]"
-                style="font-family: 'Arial Black', 'Arial', sans-serif"
+                style="font-family: 'Arial Black', Arial, sans-serif"
               >
-                EarthTrend
-                <span class="text-sky-400">NASA</span>
+                EarthTrend <span class="text-sky-400">NASA</span>
               </h1>
 
               <p
@@ -95,21 +324,20 @@ import {
             aria-label="Main navigation"
           >
             <a
-              routerLink="/explorer"
+              routerLink="/"
               aria-current="page"
               class="rounded-xl border border-sky-500/70
-                     bg-sky-950 px-4 py-2.5 text-sm
-                     font-medium text-sky-200"
+                     bg-sky-950 px-4 py-2.5
+                     text-sm font-medium text-sky-200"
             >
               Earth Explorer
             </a>
 
             <a
-              routerLink="/"
+              routerLink="/dashboard"
               class="rounded-xl border border-slate-700
                      px-4 py-2.5 text-sm text-slate-300
-                     transition hover:border-sky-500
-                     hover:text-white"
+                     transition hover:border-sky-500 hover:text-white"
             >
               Climate Dashboard
             </a>
@@ -132,7 +360,10 @@ import {
         </div>
       </header>
 
-      <!-- EARTH EXPLORER -->
+      <!-- ======================================
+           EARTH EXPLORER
+           ====================================== -->
+
       <section
         aria-label="Interactive Earth visualization"
         class="mx-auto max-w-[1800px] px-5 py-6 lg:px-8"
@@ -144,16 +375,17 @@ import {
               : 'grid grid-cols-1 items-start gap-5 xl:grid-cols-[300px_minmax(0,1fr)_280px]'
           "
         >
+
           <!-- LEFT SIDEBAR -->
           @if (!immersive()) {
             <aside class="min-w-0 space-y-5">
+
               <section
                 class="rounded-2xl border border-sky-900/70
                        bg-[#091a30] p-5"
               >
                 <div
-                  class="mb-4 flex items-center
-                         justify-between gap-3"
+                  class="mb-4 flex items-center justify-between gap-3"
                 >
                   <h2 class="text-lg font-semibold">
                     Earth Explorer
@@ -175,8 +407,8 @@ import {
                 </p>
 
                 <div
-                  class="mt-5 rounded-xl border
-                         border-sky-900/60 bg-[#102743] p-4"
+                  class="mt-5 rounded-xl border border-sky-900/60
+                         bg-[#102743] p-4"
                 >
                   <p
                     class="text-xs font-semibold uppercase
@@ -213,18 +445,23 @@ import {
 
                 <p class="mt-3 text-sm leading-6 text-slate-300">
                   NOAA provides global daily air temperature at 2 m.
-                  NASA MERRA-2 is available after importing authenticated downloads.
+                  NASA MERRA-2 is available after importing
+                  authenticated downloads.
                 </p>
 
                 <p class="mt-3 text-xs leading-5 text-slate-400">
                   The thermal layer uses a complete reanalysis grid.
-                  It is independent of the point-based historical analysis.
+                  It is independent of the point-based
+                  historical analysis.
                 </p>
               </section>
             </aside>
           }
 
-          <!-- 3D GLOBE -->
+          <!-- ======================================
+               INTERACTIVE 3D GLOBE
+               ====================================== -->
+
           <div
             [class]="
               immersive()
@@ -240,6 +477,7 @@ import {
           <!-- RIGHT SIDEBAR -->
           @if (!immersive()) {
             <aside class="min-w-0 space-y-5">
+
               <section
                 class="rounded-2xl border border-sky-900/70
                        bg-[#091a30] p-5"
@@ -329,6 +567,7 @@ import {
                       result.slope_celsius_per_decade
                         | number:'1.2-3'
                     }}
+
                     <span class="text-sm font-normal text-slate-300">
                       °C/decade
                     </span>
@@ -344,7 +583,10 @@ import {
         </div>
       </section>
 
-      <!-- CLIMATE ANALYSIS -->
+      <!-- ======================================
+           CLIMATE ANALYSIS
+           ====================================== -->
+
       @if (!immersive()) {
         <section
           id="climate-analysis"
@@ -389,7 +631,7 @@ import {
             </span>
           </div>
 
-          <!-- RESPONSIVE WORKSPACE -->
+          <!-- ANALYSIS GRID -->
           <div
             [class]="
               chartExpanded()
@@ -397,7 +639,8 @@ import {
                 : 'grid w-full min-w-0 grid-cols-1 items-start gap-5 lg:grid-cols-[360px_minmax(0,1fr)]'
             "
           >
-            <!-- FORM -->
+
+            <!-- LOCATION FORM -->
             <div
               [class]="
                 chartExpanded()
@@ -412,7 +655,7 @@ import {
               />
             </div>
 
-            <!-- CHART -->
+            <!-- ANALYSIS CHART -->
             <div
               [class]="
                 chartExpanded()
@@ -420,6 +663,7 @@ import {
                   : 'order-2 w-full min-w-0'
               "
             >
+
               @if (loading()) {
                 <div
                   role="status"
@@ -444,6 +688,7 @@ import {
                     and calculating statistical trends.
                   </p>
                 </div>
+
               } @else if (error()) {
                 <div
                   role="alert"
@@ -462,12 +707,14 @@ import {
                     Check that the FastAPI backend is running.
                   </p>
                 </div>
+
               } @else if (analysis(); as result) {
                 <app-climate-chart
                   [data]="result"
                   [expanded]="chartExpanded()"
                   (expandedChange)="chartExpanded.set($event)"
                 />
+
               } @else {
                 <div
                   class="flex min-h-[360px] flex-col
@@ -500,6 +747,7 @@ import {
                   </p>
                 </div>
               }
+
             </div>
           </div>
 
@@ -581,24 +829,186 @@ import {
         </section>
       }
 
-      <!-- FOOTER -->
+      <!-- ======================================
+           MINIMAL NASA FOOTER
+           ====================================== -->
+
       @if (!immersive()) {
-        <footer class="border-t border-sky-900/60 bg-[#061225]">
-          <div
-            class="mx-auto max-w-[1800px]
-                   px-5 py-6 text-xs text-slate-400 lg:px-8"
-          >
-            EarthTrend NASA · NASA Space Apps Challenge 2026
+        <footer
+          class="nasa-footer"
+          aria-label="EarthTrend NASA footer"
+        >
+          <div class="nasa-footer-container">
+
+            <div class="nasa-footer-main">
+
+              <!-- BRAND -->
+              <div class="nasa-footer-brand">
+                <div class="nasa-footer-identity">
+                  <img
+                    src="/logo/nasa-logo.webp"
+                    alt="NASA emblem"
+                    width="58"
+                    height="58"
+                    loading="lazy"
+                    class="nasa-footer-logo"
+                  />
+
+                  <div>
+                    <h2 class="nasa-footer-title">
+                      EARTHTREND <span>NASA</span>
+                    </h2>
+
+                    <p class="nasa-footer-subtitle">
+                      Climate Intelligence Platform
+                    </p>
+                  </div>
+                </div>
+
+                <p class="nasa-footer-description">
+                  Exploring Earth's climate through scientific data,
+                  interactive visualization and historical analysis.
+                </p>
+              </div>
+
+              <!-- EXPLORE -->
+              <div class="nasa-footer-column">
+                <h3>Explore</h3>
+
+                <nav aria-label="Explore EarthTrend NASA">
+                  <a routerLink="/">
+                    Earth Explorer
+                  </a>
+
+                  <a routerLink="/dashboard">
+                    Climate Dashboard
+                  </a>
+
+                  <a
+                    href="https://github.com/Ezequie1Sc/EarthTrend-NASA"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Source Code
+                  </a>
+                </nav>
+              </div>
+
+              <!-- RESOURCES -->
+              <div class="nasa-footer-column">
+                <h3>Resources</h3>
+
+                <nav aria-label="NASA scientific resources">
+                  <a
+                    href="https://www.nasa.gov/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    NASA
+                  </a>
+
+                  <a
+                    href="https://power.larc.nasa.gov/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    NASA POWER
+                  </a>
+
+                  <a
+                    href="https://science.nasa.gov/earth/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Earth Science
+                  </a>
+
+                  <a
+                    href="https://www.spaceappschallenge.org/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Space Apps Challenge
+                  </a>
+                </nav>
+              </div>
+            </div>
+
+            <!-- BOTTOM -->
+            <div class="nasa-footer-bottom">
+              <p class="nasa-footer-copyright">
+                © 2026 EarthTrend NASA. All rights reserved.
+              </p>
+
+              <a
+                href="https://github.com/Ezequie1Sc"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="nasa-footer-developer"
+                aria-label="Visit Ezequie1Sc on GitHub"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 2C6.477 2 2 6.477 2 12c0 4.418
+                       2.865 8.166 6.839 9.49.5.092.682-.217
+                       .682-.482 0-.237-.009-.866-.014-1.7
+                       -2.782.604-3.369-1.34-3.369-1.34
+                       -.455-1.156-1.11-1.464-1.11-1.464
+                       -.908-.62.069-.608.069-.608
+                       1.003.07 1.53 1.03 1.53 1.03
+                       .892 1.529 2.341 1.087 2.91.831
+                       .091-.646.35-1.087.636-1.337
+                       -2.22-.253-4.555-1.11-4.555-4.944
+                       0-1.092.39-1.984 1.029-2.683
+                       -.103-.253-.446-1.27.098-2.647
+                       0 0 .84-.269 2.75 1.025
+                       A9.564 9.564 0 0 1 12 6.836
+                       c.85.004 1.705.115 2.504.337
+                       1.909-1.294 2.747-1.025 2.747-1.025
+                       .546 1.377.203 2.394.1 2.647
+                       .64.699 1.028 1.591 1.028 2.683
+                       0 3.844-2.339 4.688-4.566 4.936
+                       .359.31.678.921.678 1.856
+                       0 1.34-.012 2.421-.012 2.751
+                       0 .267.18.578.688.48
+                       C19.138 20.163 22 16.417 22 12
+                       c0-5.523-4.477-10-10-10Z"
+                  />
+                </svg>
+
+                <span>
+                  Developed by <strong>@Ezequie1Sc</strong>
+                </span>
+              </a>
+            </div>
+
+            <!-- DISCLAIMER -->
+            <p class="nasa-footer-disclaimer">
+              EarthTrend NASA is an independent educational
+              and scientific visualization project.
+              It is not affiliated with or officially endorsed
+              by NASA. Scientific datasets remain attributed
+              to their respective providers.
+            </p>
+
           </div>
         </footer>
       }
+
     </main>
   `,
 })
 export class EarthExplorer {
   private readonly climateApi = inject(ClimateApiService);
 
-  readonly immersive = signal(true);
+  // Start with the side panels visible.
+  readonly immersive = signal(false);
+
   readonly chartExpanded = signal(false);
 
   readonly selectedCoordinates =
@@ -666,6 +1076,7 @@ export class EarthExplorer {
 
           this.analysis.set(analysis);
         },
+
         error: (error: unknown) => {
           if (version !== this.requestVersion) {
             return;

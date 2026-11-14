@@ -19,20 +19,14 @@ import type {
       <!-- TEMPERATURE TREND -->
       <article
         class="group relative min-w-0 overflow-hidden
-               rounded-2xl border border-sky-900/70
+               rounded-2xl border border-slate-700/50
                bg-[#091a30] p-5
-               transition-all duration-300
-               hover:-translate-y-1
-               hover:border-sky-500/60
-               hover:shadow-[0_15px_35px_rgba(14,165,233,0.08)]"
+               transition-all duration-300 ease-out
+               hover:-translate-y-0.5
+               hover:border-slate-500/60
+               hover:bg-[#0d2038]"
       >
-        <div
-          class="pointer-events-none absolute -right-10 -top-10
-                 h-32 w-32 rounded-full bg-sky-400/5
-                 blur-3xl"
-        ></div>
-
-        <div class="relative flex items-start justify-between gap-3">
+        <div class="flex items-start justify-between gap-3">
           <div>
             <p
               class="text-xs font-semibold uppercase
@@ -49,10 +43,9 @@ import type {
           <div
             class="flex h-11 w-11 shrink-0 items-center
                    justify-center rounded-xl
-                   border border-sky-700/50
-                   bg-sky-500/10 text-sky-300"
+                   border border-slate-700/60
+                   bg-white/[0.04] text-slate-300"
           >
-            <!-- TREND LINE ICON -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="22"
@@ -60,7 +53,7 @@ import type {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.8"
+              stroke-width="1.7"
               stroke-linecap="round"
               stroke-linejoin="round"
               aria-hidden="true"
@@ -72,7 +65,7 @@ import type {
           </div>
         </div>
 
-        <div class="relative mt-7">
+        <div class="mt-7">
           <div class="flex flex-wrap items-baseline gap-2">
             <span
               class="text-3xl font-semibold tracking-tight
@@ -91,18 +84,12 @@ import type {
 
           <div
             class="mt-5 flex items-center gap-2
-                   border-t border-sky-900/60 pt-4"
+                   border-t border-slate-700/40 pt-4"
           >
             <span
               class="flex h-6 w-6 items-center
-                     justify-center rounded-full"
-              [class]="
-                data().slope_celsius_per_decade > 0
-                  ? 'bg-orange-500/10 text-orange-300'
-                  : data().slope_celsius_per_decade < 0
-                    ? 'bg-cyan-500/10 text-cyan-300'
-                    : 'bg-slate-500/10 text-slate-300'
-              "
+                     justify-center rounded-full
+                     bg-white/[0.05] text-slate-300"
             >
               @if (data().slope_celsius_per_decade > 0) {
                 <svg
@@ -164,20 +151,14 @@ import type {
       <!-- R SQUARED -->
       <article
         class="group relative min-w-0 overflow-hidden
-               rounded-2xl border border-sky-900/70
+               rounded-2xl border border-slate-700/50
                bg-[#091a30] p-5
-               transition-all duration-300
-               hover:-translate-y-1
-               hover:border-violet-500/50
-               hover:shadow-[0_15px_35px_rgba(139,92,246,0.08)]"
+               transition-all duration-300 ease-out
+               hover:-translate-y-0.5
+               hover:border-slate-500/60
+               hover:bg-[#0d2038]"
       >
-        <div
-          class="pointer-events-none absolute -right-10 -top-10
-                 h-32 w-32 rounded-full bg-violet-400/5
-                 blur-3xl"
-        ></div>
-
-        <div class="relative flex items-start justify-between gap-3">
+        <div class="flex items-start justify-between gap-3">
           <div>
             <p
               class="text-xs font-semibold uppercase
@@ -194,10 +175,9 @@ import type {
           <div
             class="flex h-11 w-11 shrink-0 items-center
                    justify-center rounded-xl
-                   border border-violet-700/40
-                   bg-violet-500/10 text-violet-300"
+                   border border-slate-700/60
+                   bg-white/[0.04] text-slate-300"
           >
-            <!-- SCATTER PLOT ICON -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="22"
@@ -205,7 +185,7 @@ import type {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.8"
+              stroke-width="1.7"
               stroke-linecap="round"
               stroke-linejoin="round"
               aria-hidden="true"
@@ -215,12 +195,15 @@ import type {
               <circle cx="11" cy="11" r="1.3" />
               <circle cx="15" cy="13" r="1.3" />
               <circle cx="19" cy="6" r="1.3" />
-              <path d="m6 17 13-11" stroke-dasharray="3 3" />
+              <path
+                d="m6 17 13-11"
+                stroke-dasharray="3 3"
+              />
             </svg>
           </div>
         </div>
 
-        <div class="relative mt-7">
+        <div class="mt-7">
           <div class="flex flex-wrap items-baseline gap-2">
             <span
               class="text-3xl font-semibold tracking-tight
@@ -234,7 +217,7 @@ import type {
             </span>
           </div>
 
-          <!-- R² PROGRESS BAR -->
+          <!-- PROGRESS BAR -->
           <div
             class="mt-5 h-1.5 overflow-hidden rounded-full
                    bg-slate-800"
@@ -245,10 +228,8 @@ import type {
             [attr.aria-valuenow]="explainedVariation()"
           >
             <div
-              class="h-full rounded-full
-                     bg-gradient-to-r
-                     from-violet-500 to-sky-400
-                     transition-all duration-700"
+              class="h-full rounded-full bg-slate-400
+                     transition-all duration-700 ease-out"
               [style.width.%]="explainedVariation()"
             ></div>
           </div>
@@ -263,20 +244,14 @@ import type {
       <!-- P VALUE -->
       <article
         class="group relative min-w-0 overflow-hidden
-               rounded-2xl border border-sky-900/70
+               rounded-2xl border border-slate-700/50
                bg-[#091a30] p-5
-               transition-all duration-300
-               hover:-translate-y-1
-               hover:border-cyan-500/50
-               hover:shadow-[0_15px_35px_rgba(6,182,212,0.08)]"
+               transition-all duration-300 ease-out
+               hover:-translate-y-0.5
+               hover:border-slate-500/60
+               hover:bg-[#0d2038]"
       >
-        <div
-          class="pointer-events-none absolute -right-10 -top-10
-                 h-32 w-32 rounded-full bg-cyan-400/5
-                 blur-3xl"
-        ></div>
-
-        <div class="relative flex items-start justify-between gap-3">
+        <div class="flex items-start justify-between gap-3">
           <div>
             <p
               class="text-xs font-semibold uppercase
@@ -293,10 +268,9 @@ import type {
           <div
             class="flex h-11 w-11 shrink-0 items-center
                    justify-center rounded-xl
-                   border border-cyan-700/40
-                   bg-cyan-500/10 text-cyan-300"
+                   border border-slate-700/60
+                   bg-white/[0.04] text-slate-300"
           >
-            <!-- SIGMA ICON -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="22"
@@ -304,7 +278,7 @@ import type {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.8"
+              stroke-width="1.7"
               stroke-linecap="round"
               stroke-linejoin="round"
               aria-hidden="true"
@@ -316,7 +290,7 @@ import type {
           </div>
         </div>
 
-        <div class="relative mt-7">
+        <div class="mt-7">
           <p
             class="text-3xl font-semibold tracking-tight
                    text-white tabular-nums"
@@ -325,16 +299,16 @@ import type {
           </p>
 
           <div
-            class="mt-5 flex flex-wrap items-center
-                   gap-2 border-t border-sky-900/60 pt-4"
+            class="mt-5 flex flex-wrap items-center gap-2
+                   border-t border-slate-700/40 pt-4"
           >
             <span
               class="rounded-full border px-3 py-1
                      text-xs font-medium"
               [class]="
                 data().significant
-                  ? 'border-cyan-700/50 bg-cyan-500/10 text-cyan-300'
-                  : 'border-amber-700/50 bg-amber-500/10 text-amber-300'
+                  ? 'border-slate-500/60 bg-slate-700/40 text-slate-200'
+                  : 'border-slate-700 bg-slate-800/60 text-slate-400'
               "
             >
               {{
@@ -354,20 +328,14 @@ import type {
       <!-- TREND CLASSIFICATION -->
       <article
         class="group relative min-w-0 overflow-hidden
-               rounded-2xl border border-sky-900/70
+               rounded-2xl border border-slate-700/50
                bg-[#091a30] p-5
-               transition-all duration-300
-               hover:-translate-y-1
-               hover:border-orange-500/50
-               hover:shadow-[0_15px_35px_rgba(249,115,22,0.08)]"
+               transition-all duration-300 ease-out
+               hover:-translate-y-0.5
+               hover:border-slate-500/60
+               hover:bg-[#0d2038]"
       >
-        <div
-          class="pointer-events-none absolute -right-10 -top-10
-                 h-32 w-32 rounded-full bg-orange-400/5
-                 blur-3xl"
-        ></div>
-
-        <div class="relative flex items-start justify-between gap-3">
+        <div class="flex items-start justify-between gap-3">
           <div>
             <p
               class="text-xs font-semibold uppercase
@@ -384,10 +352,9 @@ import type {
           <div
             class="flex h-11 w-11 shrink-0 items-center
                    justify-center rounded-xl
-                   border border-orange-700/40
-                   bg-orange-500/10 text-orange-300"
+                   border border-slate-700/60
+                   bg-white/[0.04] text-slate-300"
           >
-            <!-- THERMOMETER ICON -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="22"
@@ -395,7 +362,7 @@ import type {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.8"
+              stroke-width="1.7"
               stroke-linecap="round"
               stroke-linejoin="round"
               aria-hidden="true"
@@ -407,31 +374,24 @@ import type {
           </div>
         </div>
 
-        <div class="relative mt-7">
+        <div class="mt-7">
           <p
-            class="text-3xl font-semibold
-                   capitalize tracking-tight"
-            [class]="
-              data().trend === 'warming'
-                ? 'text-orange-300'
-                : data().trend === 'cooling'
-                  ? 'text-cyan-300'
-                  : 'text-white'
-            "
+            class="text-3xl font-semibold capitalize
+                   tracking-tight text-white"
           >
             {{ data().trend }}
           </p>
 
           <div
-            class="mt-5 flex flex-wrap items-center
-                   gap-2 border-t border-sky-900/60 pt-4"
+            class="mt-5 flex flex-wrap items-center gap-2
+                   border-t border-slate-700/40 pt-4"
           >
             <span
               class="h-2 w-2 rounded-full"
               [class]="
                 data().significant
-                  ? 'bg-cyan-400'
-                  : 'bg-amber-400'
+                  ? 'bg-slate-300'
+                  : 'bg-slate-600'
               "
             ></span>
 
