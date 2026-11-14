@@ -618,7 +618,7 @@ The Angular frontend is hosted on Vercel.
 
 **Live Application:**
 
-https://earth-trend-nasa.vercel.app/
+https://earth-trend-nasa-git-master-ezequiel-s-projects-d1487261.vercel.app/
 
 ### Backend — Render
 
