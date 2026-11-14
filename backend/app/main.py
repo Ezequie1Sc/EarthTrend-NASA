@@ -1,9 +1,9 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
-from app.api.routes.thermal import router as thermal_router
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.routes.thermal import router as thermal_router
 from app.api.routes.health import router as health_router
 from app.api.routes.climate import router as climate_router
 from app.api.routes.analysis import router as analysis_router
@@ -20,13 +20,13 @@ app = FastAPI(
     debug=settings.DEBUG,
 )
 
-# CORS configuration for local Angular development.
-# Production frontend origins should be configured separately.
+# CORS configuration for Angular development and Vercel production.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:4200",
         "http://127.0.0.1:4200",
+        "https://earth-trend-nasa.vercel.app",
     ],
     allow_credentials=False,
     allow_methods=["GET", "OPTIONS"],
