@@ -7,6 +7,8 @@
 
 **An interactive platform for exploring global temperatures, climate patterns, and Earth observation data.**
 
+![EarthTrend NASA - Project Presentation](frontend/public/prueba/hero.png)
+
 [![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)](https://angular.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/)
@@ -342,6 +344,7 @@ EarthTrend-NASA/
 │   │   │   └── nasa-logo.webp
 │   │   │
 │   │   └── prueba/
+│   │       ├── hero.png
 │   │       ├── global.png
 │   │       ├── chart.png
 │   │       ├── fin.png
