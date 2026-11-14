@@ -7,7 +7,7 @@
 
 **An interactive platform for exploring global temperatures, climate patterns, and Earth observation data.**
 
-![EarthTrend NASA - Project Presentation](frontend/public/prueba/hero.png)
+![EarthTrend NASA - Project Presentation](frontend/public/prueba/global.png)
 
 [![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)](https://angular.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -106,7 +106,7 @@ Users can explore geographic temperature distributions and interact with the glo
 - Geographic exploration.
 - Interactive visualization controls.
 
-![EarthTrend NASA - Interactive 3D Earth](frontend/public/prueba/global.png)
+![EarthTrend NASA - Interactive 3D Earth](frontend/public/prueba/hero.png)
 
 ---
 
