@@ -20,7 +20,7 @@ app = FastAPI(
     debug=settings.DEBUG,
 )
 
-# CORS configuration for Angular development and Vercel production.
+# CORS: Angular local, Vercel production and project previews.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -28,12 +28,19 @@ app.add_middleware(
         "http://127.0.0.1:4200",
         "https://earth-trend-nasa.vercel.app",
     ],
+    allow_origin_regex=(
+        r"^https://earth-trend-nasa-[a-zA-Z0-9-]+"
+        r"-ezequiel-s-projects-d1487261\.vercel\.app$"
+    ),
     allow_credentials=False,
     allow_methods=["GET", "OPTIONS"],
     allow_headers=["Content-Type", "Accept"],
 )
 
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(
+    GZipMiddleware,
+    minimum_size=1000,
+)
 
 # API routers
 app.include_router(thermal_router)
