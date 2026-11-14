@@ -3,139 +3,229 @@
 
 # EarthTrend NASA
 
-### Exploring Earth's Climate Through Data and Interactive Visualization
+### Explore Earth's Climate Through Interactive Data Visualization
 
-**An interactive climate exploration platform powered by Earth science data.**
+**An interactive platform for exploring global temperatures, climate patterns, and Earth observation data.**
 
 [![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)](https://angular.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Three.js](https://img.shields.io/badge/Three.js-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
-[![NASA](https://img.shields.io/badge/Data-NASA_POWER-0B3D91)](https://power.larc.nasa.gov/)
+[![NASA POWER](https://img.shields.io/badge/Data-NASA_POWER-0B3D91)](https://power.larc.nasa.gov/)
 [![NOAA](https://img.shields.io/badge/Data-NOAA-0077BE)](https://www.noaa.gov/)
 
-**[Live Demo](https://earth-trend-nasa.vercel.app/)** · **[API Documentation](https://earthtrend-nasa-api.onrender.com/docs)** · **[GitHub Repository](https://github.com/Ezequie1Sc/EarthTrend-NASA)**
+**[Live Application](https://earth-trend-nasa.vercel.app/)** |
+**[API Documentation](https://earthtrend-nasa-api.onrender.com/docs)** |
+**[Source Code](https://github.com/Ezequie1Sc/EarthTrend-NASA)**
 
 </div>
 
 ---
 
-## Overview
+## About the Project
 
-**EarthTrend NASA** is an interactive web application designed to make climate and Earth observation data more accessible through modern visualization technologies.
+**EarthTrend NASA** is a full-stack web application that transforms scientific climate data into accessible and interactive visualizations.
 
-The platform combines a three-dimensional Earth model, global thermal data visualization, interactive climate charts, and climate trend analysis.
+The platform combines a three-dimensional Earth model, global thermal visualization, climate dashboards, and trend analysis to help users explore environmental information.
 
-By integrating data from **NASA POWER** and **NOAA**, EarthTrend NASA allows users to explore environmental information through an intuitive web interface.
+Using scientific datasets from **NASA POWER** and **NOAA**, EarthTrend NASA provides a visual approach to understanding climate conditions across different geographic locations.
 
-The project is built with Angular 22, TypeScript, Three.js, Python, and FastAPI, following a modular frontend-backend architecture.
+The application was developed with Angular 22, TypeScript, Three.js, Python, and FastAPI.
 
-## Application Screenshots
+Its architecture separates scientific data retrieval, backend processing, frontend services, and interactive visualization.
 
-### 01 — Interactive 3D Earth
+### Project Objective
 
-Explore Earth through an interactive three-dimensional globe with global thermal visualization.
+The primary objective of EarthTrend NASA is to make Earth science information easier to explore and understand.
 
-The globe combines geographic visualization with temperature data to help users understand how thermal conditions vary across the planet.
+Instead of requiring users to interpret complex scientific datasets directly, the platform presents climate information through geographic visualization, charts, and interactive controls.
 
-![EarthTrend NASA - Interactive 3D Globe](frontend/public/prueba/global.png)
-
-### 02 — Climate Charts and Trend Analysis
-
-Explore climate information through interactive charts, location-based data, and visual representations of environmental trends.
-
-The dashboard provides a structured interface for understanding climate measurements and exploring changes over time.
-
-![EarthTrend NASA - Climate Charts](frontend/public/prueba/chart.png)
-
-### 03 — Climate Data and Application Overview
-
-Explore climate indicators, environmental information, and the final section of the EarthTrend NASA interface.
-
-![EarthTrend NASA - Climate Data and Footer](frontend/public/prueba/fin.png)
+EarthTrend NASA is designed as an educational and exploratory tool for students, developers, and people interested in climate science.
 
 ---
 
 ## The Problem
 
-Climate data is essential for understanding environmental conditions and long-term changes across our planet.
+Climate and environmental information plays an important role in understanding our planet.
 
-However, scientific datasets are often presented through technical platforms, complex tables, or formats that can be difficult for non-specialist users to interpret.
+However, scientific datasets are frequently distributed through specialized platforms, technical documentation, and large collections of numerical measurements.
 
-This creates barriers for students, developers, and people interested in exploring Earth science information.
+For users without experience in data analysis, these formats can be difficult to interpret.
+
+Understanding geographic temperature distributions, climate indicators, and environmental trends often requires additional tools and technical knowledge.
+
+### The Challenge
+
+How can scientific climate data be transformed into an interactive experience that makes geographic patterns and environmental information easier to understand?
+
+---
 
 ## Our Solution
 
-EarthTrend NASA provides a visual approach to exploring climate information.
+EarthTrend NASA addresses this challenge by connecting scientific data sources with modern web visualization technologies.
 
-Instead of relying exclusively on raw datasets, the platform transforms environmental measurements into interactive visualizations.
+The application retrieves environmental information through a FastAPI backend and presents the results through an Angular interface.
 
-Users can explore a 3D globe, examine thermal distributions, interact with climate charts, and access information from established scientific data providers.
+Users can explore a three-dimensional Earth, visualize global thermal data, inspect climate charts, and examine environmental indicators.
 
-The goal is to make Earth science data easier to explore, interpret, and understand.
+### What Can Users Do?
+
+- Explore a 3D representation of Earth.
+- Visualize global temperature distributions.
+- Select available dates for thermal exploration.
+- Examine climate charts and indicators.
+- Explore location-based climate information.
+- Review climate trends through visual summaries.
+- Interact with scientific data without manually processing raw datasets.
+
+The platform focuses on making climate information more accessible through visualization.
+
+---
+
+## Application Screenshots
+
+The following screenshots demonstrate the main sections of EarthTrend NASA.
+
+### 01 — Interactive 3D Earth
+
+The Earth Explorer provides an interactive three-dimensional representation of our planet.
+
+The visualization integrates global temperature information into a thermal overlay displayed on the Earth's surface.
+
+Users can explore geographic temperature distributions and interact with the globe.
+
+**Main capabilities:**
+
+- Interactive Three.js globe.
+- Global thermal visualization.
+- Temperature-based color representation.
+- Date selection.
+- Geographic exploration.
+- Interactive visualization controls.
+
+![EarthTrend NASA - Interactive 3D Earth](frontend/public/prueba/global.png)
+
+---
+
+### 02 — Climate Charts and Trend Analysis
+
+The climate dashboard transforms environmental measurements into interactive charts and visual summaries.
+
+Users can explore climate information associated with selected locations and examine patterns across available periods.
+
+**Main capabilities:**
+
+- Interactive climate charts.
+- Location-based climate exploration.
+- Climate indicators.
+- Trend summaries.
+- NASA POWER data integration.
+
+![EarthTrend NASA - Climate Charts](frontend/public/prueba/chart.png)
+
+---
+
+### 03 — Climate Data and Application Overview
+
+EarthTrend NASA also presents climate information through structured interface sections designed to support data exploration.
+
+The application combines visual indicators, descriptive information, and a responsive layout.
+
+This screenshot highlights the climate data presentation and the final section of the interface.
+
+![EarthTrend NASA - Climate Data and Footer](frontend/public/prueba/fin.png)
+
+---
+
+### 04 — FastAPI Backend and Server
+
+EarthTrend NASA uses a Python backend developed with FastAPI and deployed on Render.
+
+The backend provides REST API endpoints for retrieving climate information, accessing thermal datasets, performing trend analysis, and checking application availability.
+
+FastAPI also provides interactive API documentation through Swagger UI.
+
+**Backend responsibilities:**
+
+- Handle requests from the Angular frontend.
+- Retrieve climate information from scientific data sources.
+- Process and structure thermal datasets.
+- Provide temperature grids.
+- Support climate trend analysis.
+- Return structured JSON responses.
+- Expose application health endpoints.
+
+![EarthTrend NASA - FastAPI Backend](frontend/public/prueba/server.png)
+
+**Backend:** https://earthtrend-nasa-api.onrender.com/
+
+**Swagger Documentation:** https://earthtrend-nasa-api.onrender.com/docs
 
 ---
 
 ## Key Features
 
-### Interactive 3D Globe
+### 1. Interactive Earth Visualization
 
-- Three-dimensional Earth visualization powered by Three.js.
-- Interactive globe controls.
-- Global temperature overlays.
-- Geographic visualization.
-- Date-based thermal data exploration.
-- Responsive user interface.
+The application uses Three.js to render an interactive three-dimensional globe.
 
-### Global Thermal Visualization
+The Earth Explorer combines geographic rendering with thermal data to provide a visual representation of temperature distributions.
 
-- Integration with NOAA thermal datasets.
-- Global temperature grid retrieval.
-- Thermal raster processing.
-- Temperature-to-color visualization.
-- Texture generation for Three.js.
-- Web Worker processing to reduce main-thread workload.
+### 2. Global Thermal Data
 
-### Climate Dashboard
+EarthTrend NASA retrieves global temperature grids through its backend.
 
-- Interactive climate charts.
-- Location selection.
-- Climate indicators.
-- Climate trend summaries.
-- Integration with NASA POWER data.
+The thermal visualization pipeline transforms geographic temperature measurements into color-based textures.
 
-### Climate Data Analysis
+These textures are applied to the globe to represent global thermal patterns.
 
-- Climate data retrieval through FastAPI.
-- Backend services for trend analysis.
-- Structured API responses.
-- Separation between data processing and presentation.
+### 3. Climate Dashboard
 
-### Modern Web Architecture
+The dashboard provides visual representations of climate measurements through charts and indicators.
 
-- Angular standalone architecture.
-- Modular components and feature-based organization.
-- TypeScript models and services.
-- REST API communication.
-- Python backend services.
-- Independent frontend and backend deployments.
+It includes components for location selection, climate chart visualization, and trend summaries.
+
+### 4. Climate Trend Analysis
+
+The backend includes dedicated services for processing climate information and analyzing trends.
+
+The results support the application's visual exploration features.
+
+### 5. Scientific Data Integration
+
+EarthTrend NASA uses data from established scientific providers:
+
+- NASA POWER.
+- NOAA.
+
+### 6. Modular Full-Stack Architecture
+
+The application separates its frontend and backend into independent services.
+
+Angular handles the user interface and visualization, while FastAPI manages API endpoints and scientific data processing.
+
+### 7. Web Worker Processing
+
+The thermal visualization uses a Web Worker to process raster data outside the main browser thread.
+
+This helps separate temperature texture generation from the interactive rendering interface.
 
 ---
 
 ## Technology Stack
 
-| Category | Technologies |
+| Layer | Technologies |
 |---|---|
 | Frontend | Angular 22, TypeScript |
-| Styling | Tailwind CSS |
+| UI Styling | Tailwind CSS |
 | 3D Visualization | Three.js |
 | Climate Visualization | Interactive charts |
 | Background Processing | Web Workers |
 | Backend | Python, FastAPI |
 | HTTP Communication | Angular HttpClient, HTTPX |
 | Data Processing | Python, TypeScript |
-| Climate Data Sources | NASA POWER, NOAA |
+| Scientific Data | NASA POWER, NOAA |
 | Frontend Hosting | Vercel |
 | Backend Hosting | Render |
 | Version Control | Git, GitHub |
@@ -144,60 +234,77 @@ The goal is to make Earth science data easier to explore, interpret, and underst
 
 ## System Architecture
 
-EarthTrend NASA uses a modular client-server architecture that separates climate data acquisition, processing, API delivery, and visualization.
+EarthTrend NASA follows a modular client-server architecture.
+
+The frontend and backend are deployed independently and communicate through REST API requests.
 
 ```text
-                  EARTH SCIENCE DATA
-                 ┌─────────────────┐
-                 │   NASA POWER    │
-                 │      NOAA       │
-                 └────────┬────────┘
-                          │
-                          ▼
-                 ┌─────────────────┐
-                 │  FASTAPI API    │
-                 │                 │
-                 │ Climate Routes  │
-                 │ Thermal Routes  │
-                 │ Analysis Routes │
-                 │ Health Routes   │
-                 └────────┬────────┘
-                          │
-                     REST / JSON
-                          │
-                          ▼
-                 ┌─────────────────┐
-                 │  ANGULAR 22     │
-                 │                 │
-                 │ Core Services   │
-                 │ Data Models     │
-                 │ Feature Modules │
-                 └────────┬────────┘
-                          │
-             ┌────────────┴────────────┐
-             │                         │
-             ▼                         ▼
-     ┌─────────────────┐     ┌─────────────────┐
-     │  EARTH EXPLORER │     │    DASHBOARD    │
-     │                 │     │                 │
-     │ Three.js Globe  │     │ Climate Charts  │
-     │ Thermal Layers  │     │ Location Data   │
-     │ Web Workers     │     │ Trend Summaries │
-     └─────────────────┘     └─────────────────┘
+                 SCIENTIFIC DATA SOURCES
+                 ┌─────────────────────┐
+                 │     NASA POWER      │
+                 │        NOAA         │
+                 └──────────┬──────────┘
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │   FASTAPI BACKEND   │
+                 │                     │
+                 │   Climate Routes    │
+                 │   Thermal Routes    │
+                 │   Analysis Routes   │
+                 │   Health Routes     │
+                 └──────────┬──────────┘
+                            │
+                         REST API
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │   ANGULAR FRONTEND  │
+                 │                     │
+                 │   Core Services     │
+                 │   TypeScript Models │
+                 │   Feature Pages     │
+                 └──────────┬──────────┘
+                            │
+                ┌───────────┴───────────┐
+                │                       │
+                ▼                       ▼
+       ┌─────────────────┐    ┌─────────────────┐
+       │  EARTH EXPLORER │    │ CLIMATE         │
+       │                 │    │ DASHBOARD       │
+       │  Three.js Globe │    │                 │
+       │  Thermal Layers │    │ Climate Charts  │
+       │  Web Workers    │    │ Trend Summaries │
+       └─────────────────┘    └─────────────────┘
 ```
 
-### Thermal Visualization Pipeline
+### How It Works
 
-The thermal visualization system processes geographic temperature data and transforms it into a texture suitable for rendering on the 3D globe.
+1. Scientific climate information is obtained from NASA POWER and NOAA.
+2. The FastAPI backend retrieves and processes the required information.
+3. Backend endpoints return structured JSON data.
+4. Angular services request the data through HTTP.
+5. The frontend transforms the information into charts and visual indicators.
+6. Thermal grid data is processed into textures for the 3D globe.
+7. Users explore the resulting visualizations through the interface.
+
+---
+
+## Thermal Visualization Pipeline
+
+The global thermal visualization uses a dedicated processing pipeline.
 
 ```text
 NOAA Thermal Data
        |
        v
-FastAPI Thermal Endpoint
+FastAPI Thermal Service
        |
        v
-Temperature Grid (JSON)
+Global Temperature Grid
+       |
+       v
+REST API Response
        |
        v
 Angular TemperatureGridService
@@ -215,10 +322,12 @@ RGBA Pixel Buffer
 Three.js DataTexture
        |
        v
-3D Earth Thermal Overlay
+Interactive 3D Earth
 ```
 
-This architecture separates network communication, data processing, and 3D rendering.
+The Web Worker performs raster processing separately from the main rendering interface.
+
+The resulting pixel buffer is converted into a Three.js texture and used to display thermal information on the globe.
 
 ---
 
@@ -230,10 +339,13 @@ EarthTrend-NASA/
 ├── frontend/
 │   ├── public/
 │   │   ├── logo/
+│   │   │   └── nasa-logo.webp
+│   │   │
 │   │   └── prueba/
 │   │       ├── global.png
 │   │       ├── chart.png
-│   │       └── fin.png
+│   │       ├── fin.png
+│   │       └── server.png
 │   │
 │   └── src/
 │       └── app/
@@ -310,21 +422,21 @@ EarthTrend-NASA/
 
 ### Prerequisites
 
-Before running the project locally, make sure you have:
+Make sure the following tools are installed:
 
 - Node.js
 - pnpm
 - Python
 - Git
 
-### 1. Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/Ezequie1Sc/EarthTrend-NASA.git
 cd EarthTrend-NASA
 ```
 
-### 2. Frontend Installation
+### Frontend Setup
 
 Navigate to the frontend directory:
 
@@ -344,13 +456,13 @@ Start the Angular development server:
 pnpm start
 ```
 
-Open the application at:
+Open:
 
 http://localhost:4200
 
-### 3. Backend Installation
+### Backend Setup
 
-Open another terminal from the project root.
+Open a second terminal from the project root.
 
 Navigate to the backend directory:
 
@@ -364,13 +476,13 @@ Create a virtual environment:
 python -m venv .venv
 ```
 
-Activate it on Windows PowerShell:
+Activate the environment on Windows PowerShell:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-Install dependencies:
+Install the backend dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -382,50 +494,53 @@ Start the FastAPI server:
 uvicorn app.main:app --reload
 ```
 
-Backend URL:
+The backend will be available at:
 
 http://127.0.0.1:8000
 
-Interactive API documentation:
+API documentation:
 
 http://127.0.0.1:8000/docs
 
-### Local API Configuration
+### API Configuration
 
-The frontend is currently configured to communicate with the deployed Render API.
+The frontend currently uses the production API deployed on Render.
 
-The API configuration is located in:
+Configuration file:
 
 ```text
 frontend/src/app/core/services/api-url.ts
 ```
 
-To connect the frontend to a local backend, change the API base URL to:
-
-```typescript
-const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
-```
-
-Restore the production URL before deploying the frontend:
+Production API:
 
 ```typescript
 const API_BASE_URL =
   'https://earthtrend-nasa-api.onrender.com/api/v1';
 ```
 
+For local development, this can be changed to:
+
+```typescript
+const API_BASE_URL =
+  'http://127.0.0.1:8000/api/v1';
+```
+
+Restore the production API URL before deploying the application.
+
 ---
 
 ## API Documentation
 
-EarthTrend NASA provides REST endpoints through FastAPI.
+EarthTrend NASA exposes REST endpoints through FastAPI.
 
-The API is divided into four main route groups.
+The backend contains four route modules.
 
-| Route Group | Description |
+| Module | Description |
 |---|---|
-| Health | API availability and health checks |
+| Health | Application availability and service checks |
 | Climate | Climate data retrieval |
-| Thermal | Global thermal data and temperature grids |
+| Thermal | Thermal sources and temperature grids |
 | Analysis | Climate trend analysis |
 
 ### Thermal Sources
@@ -434,7 +549,7 @@ The API is divided into four main route groups.
 GET /api/v1/thermal/sources
 ```
 
-Returns information about available thermal data sources.
+Returns information about the available thermal data sources.
 
 ### Global Temperature Grid
 
@@ -442,7 +557,7 @@ Returns information about available thermal data sources.
 GET /api/v1/thermal/grid?date=2024-06-15&provider=noaa
 ```
 
-Retrieves a global temperature grid for the specified date and provider.
+Retrieves global thermal grid data for the requested date and provider.
 
 ### API Root
 
@@ -450,11 +565,11 @@ Retrieves a global temperature grid for the specified date and provider.
 GET /
 ```
 
-Returns basic API information and service status.
+Returns application information and API status.
 
-### Interactive Documentation
+### Swagger UI
 
-Complete endpoint details, parameters, and response schemas are available through Swagger UI:
+The complete interactive API documentation is available at:
 
 https://earthtrend-nasa-api.onrender.com/docs
 
@@ -464,109 +579,112 @@ https://earthtrend-nasa-api.onrender.com/docs
 
 ### NASA POWER
 
-**NASA Prediction Of Worldwide Energy Resources (POWER)** provides meteorological and solar radiation data for scientific, environmental, and energy-related applications.
+NASA POWER stands for **Prediction Of Worldwide Energy Resources**.
 
-EarthTrend NASA uses NASA POWER as a source of climate information for its dashboard and analysis capabilities.
+It provides meteorological and solar radiation information derived from scientific datasets.
 
-Official website:
+EarthTrend NASA integrates NASA POWER data into its climate exploration and analysis functionality.
 
-https://power.larc.nasa.gov/
+**Official website:** https://power.larc.nasa.gov/
 
 ### NOAA
 
-The **National Oceanic and Atmospheric Administration (NOAA)** provides weather, oceanic, atmospheric, and climate information.
+The **National Oceanic and Atmospheric Administration** provides scientific information related to Earth's atmosphere, oceans, weather, and climate.
 
-EarthTrend NASA integrates NOAA-based thermal data into its global temperature visualization functionality.
+EarthTrend NASA uses NOAA-based thermal data for its global temperature visualization.
 
-Official website:
+**Official website:** https://www.noaa.gov/
 
-https://www.noaa.gov/
+### Scientific Interpretation
 
-### Data Interpretation
+EarthTrend NASA is intended for educational exploration and climate data visualization.
 
-EarthTrend NASA is intended for interactive exploration and educational visualization.
+The available measurements, dates, geographic coverage, and temporal resolution depend on the underlying datasets.
 
-Data availability, temporal coverage, geographic resolution, and measurement characteristics depend on the underlying scientific sources.
-
-Visualizations should not be interpreted as real-time measurements unless the corresponding dataset explicitly supports that interpretation.
+The application should not be interpreted as a real-time weather monitoring system unless a particular dataset explicitly supports that use.
 
 ---
 
 ## Deployment
 
-EarthTrend NASA is deployed using separate hosting platforms for its frontend and backend.
+The application is deployed using separate services.
 
 ### Frontend — Vercel
 
-The Angular application is deployed on Vercel.
+The Angular frontend is hosted on Vercel.
 
-**Production URL:**
+**Live Application:**
 
 https://earth-trend-nasa.vercel.app/
 
 ### Backend — Render
 
-The FastAPI application is deployed on Render.
+The FastAPI backend is hosted on Render.
 
-**API URL:**
+**Backend URL:**
 
 https://earthtrend-nasa-api.onrender.com/
 
-**API Documentation:**
+**Interactive Documentation:**
 
 https://earthtrend-nasa-api.onrender.com/docs
 
-### Frontend-Backend Communication
+### API Communication
 
-The Angular application communicates with FastAPI using HTTPS requests.
+The frontend communicates with the backend through HTTPS REST requests.
 
-The backend uses CORS configuration to allow authorized frontend origins, including the production deployment and project-specific Vercel preview environments.
+The backend includes CORS configuration for the production frontend, local development, and project-specific Vercel preview deployments.
 
 ---
 
 ## Testing
 
-The frontend includes test files for application and thermal visualization functionality.
+The Angular project includes test files for the application and thermal visualization components.
 
-Examples include:
+Examples:
 
 ```text
 frontend/src/app/app.spec.ts
+
 frontend/src/app/features/earth-explorer/components/earth-globe/earth-globe.spec.ts
+
 frontend/src/app/features/earth-explorer/components/earth-globe/thermal-raster.spec.ts
 ```
 
-These tests support verification of application behavior and thermal processing logic.
+These files support testing of frontend behavior and thermal processing functionality.
 
 ---
 
 ## Future Improvements
 
-Potential areas for future development include:
+Possible future enhancements include:
 
-- Additional Earth observation datasets.
-- More climate indicators.
-- Extended historical comparisons.
-- Additional geographic exploration tools.
-- Improved mobile visualization controls.
-- Exportable climate analysis reports.
+- Additional NASA Earth observation datasets.
+- Expanded historical climate comparisons.
+- More environmental indicators.
+- Additional geographic visualization controls.
+- Exportable climate reports.
+- Improved mobile interactions.
 - Expanded automated testing.
+- More advanced data analysis capabilities.
 
-These are potential enhancements and are not presented as completed functionality.
+These are proposed improvements rather than completed features.
 
 ---
 
-## Project Goals
+## Project Impact
 
-EarthTrend NASA was developed to explore how modern web technologies can make scientific information more approachable.
+EarthTrend NASA demonstrates how scientific data and modern web technologies can be combined to create accessible environmental exploration tools.
 
-Its primary goals are to:
+The project aims to:
 
-1. Make climate data easier to explore.
-2. Present environmental information through interactive visualizations.
-3. Integrate recognized Earth science data sources.
-4. Demonstrate a modular full-stack architecture.
-5. Encourage curiosity about Earth observation and climate science.
+- Encourage interest in Earth science.
+- Make climate information easier to interpret.
+- Support interactive exploration of environmental data.
+- Demonstrate practical scientific data integration.
+- Promote the use of visualization in education and technology.
+
+The platform is an educational and exploratory application, not an official climate forecasting or scientific research product.
 
 ---
 
@@ -583,7 +701,7 @@ Full-Stack Developer
 
 ## Acknowledgments
 
-This project uses technologies and scientific data resources provided by:
+EarthTrend NASA uses scientific resources and open-source technologies from:
 
 - [NASA POWER](https://power.larc.nasa.gov/)
 - [NOAA](https://www.noaa.gov/)
@@ -603,6 +721,8 @@ EarthTrend NASA is an independent educational software project and is not an off
 
 **Exploring our planet through data.**
 
-[Explore the Application](https://earth-trend-nasa.vercel.app/) · [View API Documentation](https://earthtrend-nasa-api.onrender.com/docs)
+[Live Application](https://earth-trend-nasa.vercel.app/) |
+[API Documentation](https://earthtrend-nasa-api.onrender.com/docs) |
+[GitHub](https://github.com/Ezequie1Sc/EarthTrend-NASA)
 
 </div>
